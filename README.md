@@ -32,7 +32,7 @@ https://github.com/LaneTang/job-application-workflow
 ## Something You  Want Know
 ## Profile 是啥
 
-一个简单的 .md 文档，放你的 基本信息，学历，可实习起止时间，authorization，简历attach，位置，是否接受onsite 等等等等
+一个简单的 .md 文档，放你的 基本信息，学历，可实习起止时间，authorization，性别，身份认同，住址，是否接受onsite 等等等等
 
 一个参考，这是我的 Profile.md 的结构：
 

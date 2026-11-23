@@ -35,7 +35,7 @@ Only install the skill for now; do not run any job applications.
 
 ## What is a profile?
 
-A simple `.md` document containing your basic information, education, internship availability, work authorization, resume attachment, location, willingness to work on-site, and anything else relevant.
+A simple `.md` document containing your basic information, education, internship availability, work authorization, gender, self-identification information, address, willingness to work on-site, and anything else relevant.
 
 For reference, here is the structure of my `profile.md`:
 
