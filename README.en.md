@@ -4,7 +4,7 @@ English | [简体中文](README.md)
 
 ## TL;DR
 
-> [!TIP]
+> [!IMPORTANT]
 > **“Use the $job-application-workflow skill and follow the workflow to help me apply to these 10 positions.”**
 
 Just give your agent your resume and profile, and it can automate your job applications! No more digging through messy websites to find position links or filling out long, repetitive forms over and over.
