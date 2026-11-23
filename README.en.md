@@ -7,11 +7,11 @@ English | [简体中文](README.md)
 > [!IMPORTANT]
 > **“Use the $job-application-workflow skill and follow the workflow to help me apply to these 10 positions.”**
 
-Just give your agent your resume and profile, and it can automate your job applications! No more digging through messy websites to find position links or filling out long, repetitive forms over and over.
+**Just give your resume and profile to your agent**, it can automate your job applications! No more digging through messy websites to find position links or filling out long, repetitive forms over and over.
 
-With this skill, you no longer have to tell every company where you study, what your name is, when you are available for an internship, whether you can legally work in the United States, whether you are a veteran, and so on.
+With this skill, you no longer have to tell every company where you study, what your name is, when you are available for an internship, whether you can legally work in the United States, whether you are a veteran, blablabla....
 
-### This skill alone can make your career life 10 times easier!
+### By this skill alone, make your career life 10 times easier!
 
 ### Reminder
 

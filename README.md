@@ -7,9 +7,10 @@
 > [!IMPORTANT]
 > **“用 $job-application-workflow skill，按照工作流帮我申请这10个岗位”**
 
-只需要把你的 Resume 和 Profile 发给Agent，agent 就可以全自动帮你投简历！从现在起，你再也不用从乱七八糟的网页中翻找position link，再也不用反复填写漫长重复的表单。
+**只需要把你的 Resume 和 Profile 发给Agent**，agent 就可以全自动帮你投简历！从现在起，你再也不用从乱七八糟的网页中翻找position link，再也不用反复填写漫长重复的表单。
 
 用了这个skill，你再也不用告诉每一个公司你学校在哪，叫什么名字，什么时间可以实习，可不可以在美国合法工作，是不是退伍军人......
+
 ### By this skill alone, make your career life 10 times easier!
 
 ### Reminder
