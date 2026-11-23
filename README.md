@@ -1,74 +1,85 @@
 # Job Application Workflow
 
-A Codex skill for preparing job applications with a local dashboard and a human review step before submission.
+[English](README.en.md) | 简体中文
 
-用 computer use 承担重复填表、上传已确认简历、集中收集待答题，并在本地追踪投递、测评、各轮面试和结果。适合单岗试跑、批量申请及恢复未完成申请。
+## TL;DR
 
-## 工作方式
+>“用 $job-application-workflow skill，按照工作流帮我申请这10个岗位”
 
-1. 读取最新 profile、指定简历和岗位清单，核对岗位并去重。
-2. 填写可确认的信息，结合个人实际情况与完整题目判断 sponsorship。
-3. 将真实缺项、开放题和需要本人决定的协议集中到看板。
-4. 用户保存答案后回填并核验，准备到最终复核。
-5. 默认由用户最终提交；代点提交必须在用户复核后取得该岗明确授权。
-6. 保存申请入口、岗位快照、进度查询方式和凭据，后续记录招聘时间线。
+只需要把你的 Resume 和 Profile 发给Agent，agent 就可以全自动帮你投简历！从现在起，你再也不用从乱七八糟的网页中翻找position link，再也不用反复填写漫长重复的表单。
 
-**Ready to go 与已提交分别记录。** 保存答案不等于已回填；上传附件不等于已申请。等待招聘方回复超过 21 天的岗位标为 Ghost，同时保留原招聘阶段。
+用了这个skill，你再也不用告诉每一个公司你学校在哪，叫什么名字，什么时间可以实习，可不可以在美国合法工作，是不是退伍军人......
+### By this skill alone, make your career life 10 times easier!
 
-## 安装
+### Reminder
 
-需要支持本地 skills 和 computer use 的 Codex 环境。看板使用 Python 3.9+ 标准库，当前支持 macOS / Linux（文件锁使用 `fcntl`）；部分精简系统需安装 IANA 时区数据库。
+这个skill会涉及到 Computer Use / Browser Use 的使用，我只在 GPT 上测试过，GPT用着很舒服。我使用的是 Edge 浏览器，**需要安装 ChatGPT 插件**。
 
-```bash
-git clone https://github.com/LaneTang/job-application-workflow.git ~/.agents/skills/job-application-workflow
+建议使用： ChatGPT / Claude / 其他具备 Computer Use 能力的Agent
+
+## 道理我都懂，求启动教程
+
+跟你的 Agent 说：
+
+```
+请帮我安装这个 skill：
+https://github.com/LaneTang/job-application-workflow
+
+安装后检查 SKILL.md 及资源是否完整，并告诉我如何调用。
+本次只安装，不执行求职申请。
 ```
 
-如果你的环境从 `~/.codex/skills` 加载，也可安装到该目录。选择一个已被当前客户端发现的目录即可。若新 skill 未出现，重启 Codex 后重试。
+## Something You  Want Know
+## Profile 是啥
 
-## 准备独立的求职工作区
+一个简单的 .md 文档，放你的 基本信息，学历，可实习起止时间，authorization，简历attach，位置，是否接受onsite 等等等等
 
-将私有资料与本仓库分开放置：
+一个参考，这是我的 Profile.md 的结构：
 
-```text
-my-job-search/
-  profile/
-    profile.md
-    confirmed-resume.pdf
-  applications/               # 看板自动生成
-    applications.json
-    README.md
+```
+# Job profile
+
+## basic info
+### education
+### connect link
+### diversity questions / Self-Identification Survey
+### veteran / military / public servicer related
+
+## immigration and internship positioning
+
+## Job Experience
+
+## work preferences
+
+## compensation
+
+## agreement
+
+## application workflow
 ```
 
-使用 [profile 模板](examples/profile.example.md) 创建自己的 `profile/profile.md`。确认学校、实习时间、授权背景及简历版本，不确定项保留为未知。仓库不包含任何真实申请人的资料或账本。
+## 我建议你
 
-在 Codex 中输入：
+建议你：把 Resume 和 Profile 放到本地的文件夹里，给 agent 开权限让它能够访问到，或者说放到 Agent 有权限的局部文件夹中。
 
-```text
-使用 $job-application-workflow 处理下面的岗位。
-工作区是 /absolute/path/to/my-job-search。
-先读取最新 profile 和现有账本，准备到提交前交我复核。
-[岗位清单与链接]
-```
+建议你：想好你想给 AI 提供什么样的信息，先自己写一个大概的 profile.md，然后试着用本 Skill 投两个岗位作为测试，在投的过程中看着调整。
+## 这是我的 Skill Idea
 
-## 本地看板
+Skill 输入：对口岗位清单
 
-```bash
-python3 ~/.agents/skills/job-application-workflow/scripts/dashboard.py --workspace /absolute/path/to/my-job-search init
-python3 ~/.agents/skills/job-application-workflow/scripts/dashboard.py --workspace /absolute/path/to/my-job-search serve --port 0
-```
+我想让codex通过computer use 自动化的帮我：
+1. 先检查投递环境和已知 profile 信息，是否需要额外的信息或者操作动作来登陆或者之类的，通知我来搞定，确认搞定之后，继续
+2. 根据我提供的 profile 全自动化填写 标化申请信息 （学历，可实习起止时间，authorization，简历attach，位置，是否接受onsite 等等等等）；
+3. 检查，记录高自主度申请问题（Cover Letter，为什么选择这家公司，通过实习你想学习到什么技能，你最喜欢的CPP特性是什么（？）等等）；
+4. 整理进一个标准化的表格（交互界面可以使用webUI），反给我看。定义一个对象为一个正在填写信息的独立的求职岗位，定义对象属性包含的基础信息：公司，公司链接，岗位，申请链接，尚未填写的问题数量，（然后展开所有）尚未填写的问题，ready to go？（bool）。
+5. （提供交互方式让我回答问题，当回答完问题之后）继续使用computer use 填写完剩余的问题，标记ready to go？为1，然后通知我
+6. 填写完成后停在最终预览页，展示使用的简历、已填答案、待确认事项和 ready to go 状态，通知我复核。最终投递由我点击。
 
-打开命令返回的 `http://127.0.0.1:<port>`。端口 0 会自动选择可用端口。服务只监听本机，支持填写答案、检索岗位和维护招聘时间线；停止进程后记录仍在本地。
+Skill 输出：申请表单/webUI 的 update
 
-岗位导入、回填核验、招聘事件格式及时区配置见 [记录与看板说明](references/records-and-dashboard.md)。工作流入口见 [SKILL.md](SKILL.md)。Ghost 在读取账本时重算；本 skill 不会在后台定时检查邮箱或发送通知。
+### 提交原则
 
-## 数据与权限
-
-申请资料保存在使用者自己的工作区。只有使用者授权的申请操作才将资料传给招聘站点。隐私声明按个人 profile 设置处理；法律协议单独复核。不要提交真实 profile、简历、邮箱正文、验证码或申请账本到本仓库。
-
-本工具帮助组织申请流程，不保证录用、签证资格或学校批准，也不代替招聘方和学校对具体要求的确认。
-
-## 验证
-
-```bash
-python3 -m unittest discover -s tests -v
-```
+Codex SHOULD NOT 越过我直接 apply。每个岗位都需要我复核最终预览。
+- “申请这个岗位”“继续”“加上这个”“同时申请 5 个”等指令授权推进准备和填表。点击 Submit、Submit application、Send application 或其他实际发送申请的最终按钮，需要我在复核后针对具体岗位明确授权，否则由我亲自点击。
+- ready to go = true 表示材料与表单已准备好，等待我复核和提交。已提交状态必须依据实际成功页面或其他明确凭据记录。
+- 默认同意申请隐私声明的偏好仅适用于隐私声明，最终提交仍遵守上述逐岗复核规则。
