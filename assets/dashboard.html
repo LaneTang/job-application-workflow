@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>申请记录 | 求职工作台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #211932;
+      --muted: #655d74;
+      --paper: #f7f5fa;
+      --white: #fff;
+      --line: #e9e4ef;
+      --violet: #553598;
+      --lavender: #ece3fa;
+      --green: #2f674b;
+      --radius: 18px;
+      font: 15px/1.55 "Avenir Next", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body, h1, h2, h3, p, dl, dd { margin: 0; }
+    button, input, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: default; opacity: .58; }
+    a { color: var(--violet); text-underline-offset: 3px; }
+    [hidden] { display: none !important; }
+    :focus-visible { outline: 2px solid #7853c8; outline-offset: 3px; }
+    .wrap { width: min(1280px, calc(100% - 72px)); margin-inline: auto; }
+    .topbar { border-bottom: 1px solid var(--line); background: var(--white); }
+    .bar { min-height: 65px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand, .bar-actions, .quiet-button, .action, .search, .detail-meta {
+      display: flex; align-items: center; gap: 9px;
+    }
+    .brand { font-size: 14px; font-weight: 700; white-space: nowrap; }
+    .brand-mark {
+      display: grid; place-items: center; width: 34px; height: 34px;
+      color: white; background: var(--violet); border-radius: 10px 10px 10px 4px;
+    }
+    .icon { width: 17px; height: 17px; flex: none; }
+    .bar-actions { gap: 15px; }
+    .local { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .local::before {
+      display: inline-block; margin-right: 6px; width: 7px; height: 7px;
+      border-radius: 50%; background: #548266; content: "";
+    }
+    .quiet-button {
+      padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px;
+      background: var(--white); font-size: 13px; white-space: nowrap;
+    }
+    .quiet-button:hover, .action.secondary:hover { background: var(--paper); }
+    main { padding: 38px 0 56px; }
+    .overview {
+      display: grid; grid-template-columns: 1fr minmax(355px, .83fr);
+      align-items: center; gap: 32px; margin-bottom: 31px;
+    }
+    h1 { font-size: clamp(36px, 4vw, 53px); font-weight: 780; line-height: 1.14; letter-spacing: -.055em; }
+    .intro { color: var(--muted); margin-top: 11px; font-size: 14px; }
+    .pipeline {
+      padding: 16px 19px; border: 1px solid #e5daf5; background: #f1eaf9;
+      border-radius: 15px 15px 15px 5px;
+    }
+    .pipeline-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .pipeline-head strong { color: #3e2766; font-size: 14px; }
+    .pipeline-head span { color: var(--muted); font-size: 12px; }
+    .track {
+      position: relative; display: flex; height: 12px; margin: 11px 0 9px;
+      overflow: hidden; border-radius: 3px; background: #e6ddef;
+    }
+    .track > span { height: 100%; }
+    .track .sent, .legend .sent { background: #604096; }
+    .track .open, .legend .open { background: #ac8bd7; }
+    .track .closed, .legend .closed { background: #b8aebf; }
+    .track[data-ticks]::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(to right, transparent 0 calc(var(--step) - 2px), #f1eaf9 calc(var(--step) - 2px) var(--step));
+    }
+    .legend { display: flex; flex-wrap: wrap; gap: 3px 15px; color: #51455f; font-size: 12px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { width: 7px; height: 7px; border-radius: 2px; }
+    .notice { margin: -8px 0 15px; padding: 9px 13px; border-radius: 8px; background: #e8f4ec; color: #245c42; }
+    .notice.error { background: #fae9e8; color: #9c3736; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); align-items: start; gap: 19px; }
+    .roster, .dossier {
+      min-width: 0; border: 1px solid var(--line); background: var(--white);
+      border-radius: var(--radius);
+    }
+    .roster { overflow: hidden; }
+    .roster-head { padding: 16px 18px 0; }
+    h2 { font-size: 21px; line-height: 1.35; letter-spacing: -.025em; }
+    .roster-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .count { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .search {
+      padding: 0 11px; background: #faf8fc; border: 1px solid #e8e1ef;
+      border-radius: 9px; color: #766787;
+    }
+    .search:focus-within { border-color: #9979ce; box-shadow: 0 0 0 2px #eee6fb; }
+    .search input { display: block; min-width: 0; width: 100%; height: 39px; border: 0; outline: 0; background: transparent; font-size: 13px; }
+    .search input::placeholder { color: #71667e; }
+    .filters { display: flex; flex-wrap: wrap; gap: 2px 14px; margin: 7px 0 -1px; }
+    .filter {
+      position: relative; padding: 9px 1px 10px; border: 0; border-bottom: 2px solid transparent;
+      background: none; color: var(--muted); font-size: 13px; white-space: nowrap;
+    }
+    .filter:hover, .filter[aria-pressed="true"] { color: var(--violet); }
+    .filter[aria-pressed="true"] { border-color: var(--violet); font-weight: 700; }
+    .filter span { margin-left: 4px; font-variant-numeric: tabular-nums; font-size: 11px; }
+    .jobs { min-height: 100px; list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+    .jobs li + li { border-top: 1px solid var(--line); }
+    .job {
+      display: grid; width: 100%; grid-template-columns: minmax(0, 1fr) auto 10px;
+      gap: 10px; position: relative; align-items: center; text-align: left;
+      padding: 13px 16px 13px 18px; border: 0; background: transparent;
+    }
+    .job:focus-visible { outline-offset: -4px; }
+    .job:hover { background: #faf8fd; }
+    .job[aria-current="true"] { background: #f2ecfa; }
+    .job[aria-current="true"]::before {
+      position: absolute; inset: 7px auto 7px 0; width: 3px; background: #7957b8; border-radius: 0 3px 3px 0; content: "";
+    }
+    .role { display: block; font-size: 14px; line-height: 1.37; font-weight: 700; overflow-wrap: anywhere; }
+    .company { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+    .row-state { text-align: right; }
+    .row-state small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; white-space: nowrap; }
+    .chevron { width: 6px; height: 6px; border: solid #87769e; border-width: 1px 1px 0 0; transform: rotate(45deg); }
+    .badge {
+      display: inline-flex; gap: 5px; align-items: center; max-width: 100%;
+      padding: 3px 8px; border-radius: 5px; color: #574a64; background: #f1edf4;
+      font-size: 11px; line-height: 1.4; font-weight: 650; white-space: nowrap;
+    }
+    .badge::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .badge[data-state="submitted"], .badge[data-state="interviewing"], .badge[data-state="offer"] { color: #285b44; background: #e6f1e9; }
+    .badge[data-state="ready_for_review"], .badge[data-state="filling"], .badge[data-state="checking"] { color: #553598; background: #eee5fc; }
+    .badge[data-state="waiting_for_user"], .badge[data-state="needs_review"] { color: #794914; background: #f9efdc; }
+    .badge[data-state="blocked"], .badge[data-state="rejected"] { color: #8b3c44; background: #faebed; }
+    .badge[data-state="invited"], .badge[data-state="assessment"] { color: #553598; background: #eee5fc; }
+    .badge.ghost { color: #8a3d31; background: #f9eee7; }
+    .row-state > .badge + .badge { display: table; margin: 4px 0 0 auto; }
+    .dossier { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; scrollbar-width: thin; }
+    .dossier-head { padding: 20px 20px 17px; }
+    .detail-company { color: var(--violet); font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+    .detail-company a { text-decoration: none; }
+    .detail-company a:hover { text-decoration: underline; }
+    .dossier h2 { font-size: clamp(20px, 2.1vw, 27px); overflow-wrap: anywhere; }
+    .detail-meta { flex-wrap: wrap; margin-top: 9px; color: var(--muted); font-size: 12px; }
+    .detail-meta .badge { margin-right: 2px; }
+    .detail-meta span { overflow-wrap: anywhere; }
+    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 14px; }
+    .action {
+      width: fit-content; min-height: 35px; padding: 6px 10px; border: 1px solid transparent;
+      border-radius: 7px; background: var(--violet); color: white; text-decoration: none;
+      font-size: 12px; font-weight: 650;
+    }
+    .action:hover { background: #462880; }
+    .action.secondary { color: var(--violet); background: white; border-color: #e4dbea; }
+    .action .icon { width: 14px; height: 14px; }
+    .detail-block { padding: 14px 20px; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+    .detail-block h3 { font-size: 14px; margin-bottom: 7px; font-weight: 750; }
+    .detail-block p, .detail-block li, .facts { font-size: 13px; }
+    .detail-block p + p { margin-top: 5px; }
+    .tracking { margin: 0 13px 10px; padding: 12px 14px; border: 0; border-radius: 10px; background: #f3edf9; }
+    .tracking p { color: #51425f; }
+    .tracking .actions { margin-top: 9px; }
+    .facts { display: grid; grid-template-columns: minmax(80px, .44fr) minmax(0, 1fr); gap: 6px 10px; }
+    .facts dt, .muted { color: var(--muted); }
+    .disclosure { padding: 10px 20px; border-top: 1px solid var(--line); }
+    .disclosure summary { cursor: pointer; color: var(--violet); font-size: 13px; font-weight: 650; }
+    .disclosure > :not(summary) { margin-top: 9px; font-size: 13px; overflow-wrap: anywhere; }
+    .disclosure ul, .detail-block ul { padding-left: 17px; margin-bottom: 0; }
+    .history { list-style: none; padding-left: 0 !important; }
+    .history li { padding-left: 11px; border-left: 2px solid var(--lavender); padding-bottom: 7px; }
+    .history time { display: block; color: var(--muted); font-size: 11px; }
+    .progress-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .progress-header h3 { margin-bottom: 0; }
+    .waiting { color: var(--muted); margin-bottom: 10px; }
+    .waiting.overdue { color: #8a3d31; }
+    dialog {
+      width: min(440px, calc(100% - 28px)); max-height: calc(100dvh - 28px); overflow: auto;
+      border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; color: var(--ink);
+    }
+    dialog::backdrop { background: rgb(33 25 50 / 38%); }
+    .progress-form label { display: block; font-size: 13px; margin-top: 11px; font-weight: 650; }
+    .progress-form input, .progress-form select {
+      width: 100%; margin-top: 4px; padding: 6px 9px; border: 1px solid #dcd2e7;
+      border-radius: 7px; background: #fcfbfe;
+    }
+    .progress-form .error-text { font-size: 13px; margin-top: 9px; }
+    .question + .question { margin-top: 12px; }
+    .question label { display: block; font-weight: 680; overflow-wrap: anywhere; }
+    textarea {
+      display: block; width: 100%; min-height: 85px; margin-top: 6px;
+      padding: 8px 10px; border: 1px solid #dcd2e7; border-radius: 7px; resize: vertical; background: #fcfbfe;
+    }
+    .answer-status, .question p { font-size: 12px; }
+    .question-section { background: #faf7fe; }
+    .answer-status { color: var(--muted); }
+    .error-text { color: #a03239; }
+    .empty { padding: 25px 18px; color: var(--muted); font-size: 13px; }
+    .empty strong { display: block; color: var(--ink); margin-bottom: 4px; }
+    .back { display: none; }
+    .followup { color: var(--green); }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+    }
+    @media (max-width: 850px) {
+      .wrap { width: calc(100% - 36px); }
+      .overview { gap: 20px; grid-template-columns: 1fr minmax(280px, .93fr); }
+      .workspace { gap: 12px; }
+    }
+    @media (max-width: 680px) {
+      .wrap { width: calc(100% - 28px); }
+      .bar { min-height: 57px; }
+      .bar-actions { gap: 8px; }
+      .local { display: none; }
+      main { padding-top: 24px; }
+      .overview { grid-template-columns: 1fr; gap: 16px; margin-bottom: 18px; }
+      .workspace { display: block; }
+      .dossier { display: none; position: static; max-height: none; }
+      .workspace.mobile-open .roster { display: none; }
+      .workspace.mobile-open .dossier { display: block; }
+      .back { display: flex; margin: 15px 15px 0; }
+      .dossier h2 { font-size: 23px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap bar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h14V4h-3M9 3h6v4H9zM8 11h8M8 15h5"/></svg>
+        </div>
+        求职工作台
+      </div>
+      <div class="bar-actions">
+        <span class="local">本地账本</span>
+        <button class="quiet-button" id="refresh" type="button">
+          <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-13.7-5.6L4 8m0-5v5h5M4 13a8 8 0 0 0 13.7 5.6L20 16m0 5v-5h-5"/></svg>
+          刷新记录
+        </button>
+      </div>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="overview" aria-labelledby="page-title">
+      <div>
+        <h1 id="page-title">申请记录</h1>
+        <p class="intro">按公司、岗位或编号查重，回看投递与跟进记录。</p>
+      </div>
+      <div class="pipeline">
+        <div class="pipeline-head"><strong>投递分布</strong><span id="total">读取中</span></div>
+        <div id="track" class="track" aria-hidden="true"></div>
+        <div id="legend" class="legend"></div>
+      </div>
+    </section>
+    <p id="notice" class="notice" role="status" hidden></p>
+    <div class="workspace" id="workspace">
+      <section class="roster" aria-labelledby="roster-title">
+        <div class="roster-head">
+          <div class="roster-title"><h2 id="roster-title">岗位列表</h2><span id="result-count" class="count" aria-live="polite"></span></div>
+          <label class="search">
+            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 4 4"/></svg>
+            <span class="sr-only">搜索公司、岗位或编号</span>
+            <input id="search" type="search" placeholder="搜索公司、岗位或编号" autocomplete="off">
+          </label>
+          <div class="filters" role="group" aria-label="筛选岗位">
+            <button class="filter" type="button" data-filter="all" aria-pressed="true">全部<span></span></button>
+            <button class="filter" type="button" data-filter="pending" aria-pressed="false">待回填<span></span></button>
+            <button class="filter" type="button" data-filter="ready" aria-pressed="false">待复核<span></span></button>
+            <button class="filter" type="button" data-filter="submitted" aria-pressed="false">已投递<span></span></button>
+            <button class="filter" type="button" data-filter="recruiting" aria-pressed="false">面试 / 测评<span></span></button>
+            <button class="filter" type="button" data-filter="ghost" aria-pressed="false">Ghost<span></span></button>
+          </div>
+        </div>
+        <ul id="jobs" class="jobs"><li class="empty">正在读取岗位记录…</li></ul>
+      </section>
+      <section class="dossier" aria-label="岗位详情">
+        <button id="back" class="quiet-button back" type="button">‹ 返回岗位列表</button>
+        <div id="detail" class="empty">选择岗位，查看申请详情。</div>
+      </section>
+    </div>
+  </main>
+  <dialog id="progress-dialog" aria-labelledby="progress-title">
+    <form class="progress-form" id="progress-form">
+      <h2 id="progress-title">记录招聘进展</h2>
+      <p id="progress-job" class="muted"></p>
+      <label>事件<select id="progress-kind" name="kind" required></select></label>
+      <label>发生日期<input id="progress-date" name="date" type="date" required></label>
+      <label id="round-field" hidden>面试轮次（选填）<input name="round" type="number" min="1" step="1" placeholder="例如 2"></label>
+      <label id="schedule-field" hidden>安排的面试日期<input name="scheduled_for" type="date"></label>
+      <label>备注（选填）<textarea name="note" maxlength="2000" rows="2"></textarea></label>
+      <p id="progress-error" class="error-text" role="alert" hidden></p>
+      <div class="actions">
+        <button class="action" type="submit">保存进展</button>
+        <button class="quiet-button" id="progress-cancel" type="button">取消</button>
+      </div>
+    </form>
+  </dialog>
+  <script>
+    const labels = {
+      queued: '待处理', checking: '核对中', filling: '填写中', waiting_for_user: '待补充',
+      ready_for_review: '待复核', submitted: '已提交', closed: '已关闭', needs_review: '需确认',
+      blocked: '受阻', interviewing: '面试中', offer: '已获 Offer', rejected: '已拒绝', withdrawn: '已撤回',
+    };
+    const eventLabels = {record_created: '建立记录', record_updated: '更新记录', answers_saved: '保存答案', recruiting_event_recorded: '保存招聘进展'};
+    const questionLabels = {awaiting_answer: '待回答', answered: '已回答，待回填', applied: '已回填', skipped: '已跳过'};
+    const identifierLabels = {job_id: '岗位编号', requisition_id: '招聘编号', publication_id: '发布编号', linkedin_id: 'LinkedIn 编号'};
+    const recruitingStates = new Set(['invited', 'interviewing', 'assessment']);
+    const submittedStates = new Set(['submitted', 'offer', 'rejected', 'withdrawn', 'accepted', 'declined', ...recruitingStates]);
+    const $ = id => document.getElementById(id);
+    const drafts = new Map();
+    const mobile = matchMedia('(max-width: 680px)');
+    const filters = [...document.querySelectorAll('[data-filter]')];
+    let state = {jobs: []};
+    let filter = 'all';
+    let selectedId;
+    let showingMobileDetail = false;
+    let detailSignature;
+    let loading = false;
+    let saving = false;
+    let initialized = false;
+    let progressJobId;
+
+    function element(tag, text, className) {
+      const node = document.createElement(tag);
+      if (text !== undefined) node.textContent = text;
+      if (className) node.className = className;
+      return node;
+    }
+
+    function link(text, url, className) {
+      try {
+        const target = new URL(url);
+        if (!['http:', 'https:'].includes(target.protocol)) return null;
+        const node = element('a', text, className);
+        node.href = target.href;
+        node.target = '_blank';
+        node.rel = 'noopener noreferrer';
+        return node;
+      } catch {
+        return null;
+      }
+    }
+
+    function formatTime(value, withTime = false) {
+      if (!value) return '';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      const options = {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: state.timezone || 'UTC'};
+      if (withTime) Object.assign(options, {hour: '2-digit', minute: '2-digit', hourCycle: 'h23'});
+      return new Intl.DateTimeFormat('zh-CN', options).format(date);
+    }
+
+    function notice(text = '', error = false) {
+      $('notice').textContent = text;
+      $('notice').hidden = !text;
+      $('notice').classList.toggle('error', error);
+    }
+
+    function hasDrafts() {
+      return [...drafts.values()].some(answers => answers.size);
+    }
+
+    function syncRefresh() {
+      $('refresh').disabled = loading || saving || hasDrafts();
+      $('refresh').title = hasDrafts() ? '请先保存已编辑的答案' : '';
+    }
+
+    function status(job) {
+      const badge = element('span', job.recruiting?.label || labels[job.state] || job.state, 'badge');
+      badge.dataset.state = job.state;
+      return job.recruiting?.ghost ? [badge, element('span', 'Ghost', 'badge ghost')] : [badge];
+    }
+
+    function reviewHint(job) {
+      if (job.status_confidence === 'imported_unverified') return '提交待核对';
+      if (job.status_confidence === 'company_confirmed_role_unverified') return '岗位待核对';
+      if (!submittedStates.has(job.state) && job.pending_question_count > 0) return `${job.pending_question_count} 题待回填`;
+      return '';
+    }
+
+    function matches(job, value) {
+      if (value === 'pending') return !submittedStates.has(job.state) && job.pending_question_count > 0;
+      if (value === 'ready') return job.ready_to_go;
+      if (value === 'submitted') return submittedStates.has(job.state);
+      if (value === 'recruiting') return recruitingStates.has(job.state);
+      if (value === 'ghost') return Boolean(job.recruiting?.ghost);
+      return true;
+    }
+
+    function sortTime(job) {
+      return Date.parse(job.recruiting?.latest_event || job.confirmation_received_at || job.submitted_at || job.checked_at || job.updated_at) || 0;
+    }
+
+    function renderOverview() {
+      const all = state.jobs.length;
+      const sent = state.jobs.filter(job => submittedStates.has(job.state)).length;
+      const closed = state.jobs.filter(job => job.state === 'closed').length;
+      const groups = [
+        ['sent', '已有提交记录', sent],
+        ['open', '未投递或待核对', all - sent - closed],
+        ['closed', '岗位关闭', closed],
+      ];
+      $('total').textContent = `共 ${all} 个岗位`;
+      $('track').replaceChildren();
+      $('legend').replaceChildren();
+      $('track').toggleAttribute('data-ticks', all > 0 && all <= 60);
+      if (all) $('track').style.setProperty('--step', `${100 / all}%`);
+      for (const [tone, name, count] of groups) {
+        if (count) {
+          const segment = element('span', undefined, tone);
+          segment.style.flexGrow = count;
+          $('track').append(segment);
+        }
+        const entry = element('span');
+        entry.append(element('i', undefined, tone), document.createTextNode(`${name} ${count}`));
+        $('legend').append(entry);
+      }
+    }
+
+    function selectJob(id, openOnMobile = false) {
+      selectedId = id;
+      if (openOnMobile) showingMobileDetail = true;
+      $('workspace').classList.toggle('mobile-open', showingMobileDetail);
+      for (const button of $('jobs').querySelectorAll('button')) {
+        if (button.dataset.job === id) button.setAttribute('aria-current', 'true');
+        else button.removeAttribute('aria-current');
+      }
+      renderDetail(state.jobs.find(job => job.id === id));
+      if (openOnMobile && mobile.matches) {
+        $('back').focus({preventScroll: true});
+        $('workspace').scrollIntoView({block: 'start'});
+      }
+    }
+
+    function renderList() {
+      for (const button of filters) {
+        button.setAttribute('aria-pressed', String(button.dataset.filter === filter));
+        button.lastElementChild.textContent = state.jobs.filter(job => matches(job, button.dataset.filter)).length;
+      }
+      const query = $('search').value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+      const visible = state.jobs.filter(job => {
+        const haystack = [job.company, job.role, job.location, job.id, job.recruiting?.label, ...Object.values(job.identifiers || {})].join(' ').toLocaleLowerCase();
+        return matches(job, filter) && query.every(word => haystack.includes(word));
+      }).sort((a, b) => sortTime(b) - sortTime(a));
+      $('result-count').textContent = `显示 ${visible.length} 个`;
+      const previousFocus = document.activeElement?.dataset.job;
+      const rows = document.createDocumentFragment();
+      for (const job of visible) {
+        const item = element('li');
+        const row = element('button', undefined, 'job');
+        row.type = 'button';
+        row.dataset.job = job.id;
+        const leading = element('span');
+        leading.append(element('strong', job.role || '岗位名称待核对', 'role'), element('span', job.company || '公司待核对', 'company'));
+        const trailing = element('span', undefined, 'row-state');
+        trailing.append(...status(job));
+        const hint = reviewHint(job);
+        if (hint) trailing.append(element('small', hint));
+        const arrow = element('span', undefined, 'chevron');
+        arrow.setAttribute('aria-hidden', 'true');
+        row.append(leading, trailing, arrow);
+        row.addEventListener('click', () => selectJob(job.id, true));
+        item.append(row);
+        rows.append(item);
+      }
+      if (!visible.length) {
+        const empty = element('li', undefined, 'empty');
+        const title = query.length ? '没有匹配的岗位' : ({
+          all: '还没有岗位记录', pending: '暂无待回填岗位', ready: '暂无待复核岗位', submitted: '暂无投递记录',
+          recruiting: '暂无面试或测评记录', ghost: '暂无超过 21 天未收到回复的岗位',
+        })[filter];
+        empty.append(element('strong', title));
+        if (query.length) empty.append(document.createTextNode('试试公司简称、岗位关键词或招聘编号。'));
+        else if (filter !== 'all') empty.append(document.createTextNode('切换到「全部」查看其他岗位。'));
+        rows.append(empty);
+      }
+      $('jobs').replaceChildren(rows);
+      if (!visible.some(job => job.id === selectedId)) {
+        selectedId = visible[0]?.id;
+        showingMobileDetail = false;
+      }
+      selectJob(selectedId);
+      if (previousFocus && !showingMobileDetail) {
+        [...$('jobs').querySelectorAll('button')].find(button => button.dataset.job === previousFocus)?.focus({preventScroll: true});
+      }
+    }
+
+    function block(title, variant = '') {
+      const section = element('section', undefined, `detail-block ${variant}`.trim());
+      section.append(element('h3', title));
+      return section;
+    }
+
+    function entries(parent, pairs) {
+      const list = element('dl', undefined, 'facts');
+      for (const [key, value] of pairs) {
+        const text = Array.isArray(value) ? value.join('、') : value;
+        if (text == null || text === '') continue;
+        list.append(element('dt', key), element('dd', text));
+      }
+      if (list.childElementCount) parent.append(list);
+    }
+
+    function disclosure(title) {
+      const details = element('details', undefined, 'disclosure');
+      details.append(element('summary', title));
+      return details;
+    }
+
+    function listItems(parent, values) {
+      if (!values?.length) return;
+      const list = element('ul');
+      for (const item of values) list.append(element('li', typeof item === 'string' ? item : JSON.stringify(item)));
+      parent.append(list);
+    }
+
+    function appendActions(parent, items) {
+      const actions = element('div', undefined, 'actions');
+      for (const [label, url, primary] of items) {
+        const entry = link(label, url, primary ? 'action' : 'action secondary');
+        if (entry) actions.append(entry);
+      }
+      if (actions.childElementCount) parent.append(actions);
+    }
+
+    function renderDetail(job) {
+      const signature = JSON.stringify(job);
+      if (signature === detailSignature) return;
+      detailSignature = signature;
+      const detail = $('detail');
+      detail.replaceChildren();
+      detail.className = job ? '' : 'empty';
+      detail.closest('.dossier').scrollTop = 0;
+      if (!job) {
+        detail.textContent = '选择岗位，查看申请详情。';
+        return;
+      }
+      const heading = element('header', undefined, 'dossier-head');
+      const company = element('p', undefined, 'detail-company');
+      company.append(link(job.company, job.company_url) || document.createTextNode(job.company || '公司待核对'));
+      heading.append(company, element('h2', job.role || '岗位名称待核对'));
+      const meta = element('div', undefined, 'detail-meta');
+      meta.append(...status(job));
+      if (job.location) meta.append(element('span', job.location));
+      const ids = Object.entries(job.identifiers || {}).filter(([key, value]) => identifierLabels[key] && value);
+      if (ids.length) {
+        const [key, value] = ids.find(([key]) => key === 'requisition_id') || ids[0];
+        meta.append(element('span', `${identifierLabels[key]} ${value}`));
+      }
+      heading.append(meta);
+      appendActions(heading, [
+        [job.ready_to_go ? '打开申请复核' : '打开申请页', job.apply_url, Boolean(job.ready_to_go)],
+        ['查看岗位描述', job.jd_url !== job.apply_url ? job.jd_url : null],
+      ]);
+      if (job.ready_to_go) heading.append(element('p', '请在原申请网站复核并提交。', 'intro followup'));
+      detail.append(heading);
+
+      const tracking = block('查申请进度', 'tracking');
+      const progress = job.tracking || {};
+      if (progress.instructions) tracking.append(element('p', progress.instructions));
+      else if (!progress.url && !progress.email_url) tracking.append(element('p', '查询方式待补充。'));
+      appendActions(tracking, [
+        [progress.url === progress.email_url ? '打开确认邮件' : '打开查询入口', progress.url, true],
+        ['打开确认邮件', progress.email_url !== progress.url ? progress.email_url : null, !progress.url],
+      ]);
+      detail.append(tracking);
+      if (job.recruiting) detail.append(renderRecruiting(job));
+
+      if (job.questions?.length) detail.append(renderQuestions(job));
+
+      const record = block('申请状态');
+      entries(record, [
+        ['提交日期', formatTime(job.submitted_at)],
+        ['最近核对', formatTime(job.checked_at)],
+        ['状态来源', job.status_source?.label],
+        ['职位状态', job.posting_status],
+      ]);
+      if (record.childElementCount === 1) record.append(element('p', '待补充核对记录。', 'muted'));
+      detail.append(record);
+      if (job.status_audit) {
+        const audit = disclosure('最近一次状态核查');
+        audit.append(element('p', formatTime(job.status_audit.checked_at, true), 'muted'));
+        listItems(audit, job.status_audit.findings);
+        detail.append(audit);
+      }
+
+      if (Object.values(job.job_details || {}).some(value => value != null && value !== '')) {
+        const facts = block('岗位信息快照');
+        entries(facts, Object.entries(job.job_details));
+        detail.append(facts);
+      }
+      if (!job.apply_url && !job.jd_url) record.append(element('p', '原岗位链接待补充。', 'muted'));
+      if (job.blockers?.length || job.notes?.length) {
+        const notes = disclosure('申请备注与待确认事项');
+        listItems(notes, job.blockers);
+        listItems(notes, job.notes);
+        detail.append(notes);
+      }
+      if (job.resume_path || job.fields?.length || ids.length) {
+        const sources = disclosure('投递材料与字段来源');
+        entries(sources, [
+          ...ids.map(([key, value]) => [identifierLabels[key], value]),
+          ['简历', job.resume_path],
+          ...(job.fields || []).map(field => [field.label, [field.value, field.verified ? '已核验' : '待核验', field.source].filter(value => value != null && value !== '').join(' / ')]),
+        ]);
+        detail.append(sources);
+      }
+      if (job.history?.length || job.submission_evidence?.text) {
+        const history = disclosure('状态变更记录');
+        if (job.submission_evidence?.text) history.append(element('p', job.submission_evidence.text));
+        const timeline = element('ul', undefined, 'history');
+        for (const event of [...(job.history || [])].reverse()) {
+          const item = element('li');
+          item.append(element('time', formatTime(event.at, true)));
+          const transition = event.from_state && event.from_state !== event.to_state
+            ? `${labels[event.from_state] || event.from_state} → ${labels[event.to_state] || event.to_state}`
+            : labels[event.to_state] || '';
+          item.append(document.createTextNode([eventLabels[event.event] || event.event, transition].filter(Boolean).join(' / ')));
+          timeline.append(item);
+        }
+        if (timeline.childElementCount) history.append(timeline);
+        detail.append(history);
+      }
+    }
+
+    function renderRecruiting(job) {
+      const progress = job.recruiting;
+      const section = element('section', undefined, 'detail-block');
+      const header = element('div', undefined, 'progress-header');
+      const add = element('button', '添加进展', 'quiet-button');
+      add.type = 'button';
+      add.addEventListener('click', () => openProgress(job));
+      header.append(element('h3', '招聘时间线'), add);
+      section.append(header);
+      let waiting = '';
+      if (progress.waiting_on === 'candidate') waiting = '待你回复或完成下一步';
+      else if (progress.waiting_on === 'scheduled') waiting = '已有面试安排';
+      else if (progress.waiting_days != null) {
+        waiting = progress.ghost
+          ? `Ghost：已等招聘方回复 ${progress.waiting_days} 天`
+          : `等待招聘方回复 ${progress.waiting_days} 天`;
+      } else if (progress.waiting_on) waiting = '等待起始日期待补充';
+      if (waiting) section.append(element('p', waiting, progress.ghost ? 'waiting overdue' : 'waiting'));
+
+      const timeline = element('ul', undefined, 'history');
+      for (const event of progress.events) {
+        const item = element('li');
+        item.append(element('time', formatTime(event.date)), element('strong', event.label));
+        if (event.scheduled_for) item.append(element('p', `面试日期 ${formatTime(event.scheduled_for)}`, 'muted'));
+        if (event.note) item.append(element('p', event.note));
+        if (event.source) item.append(element('p', event.source, 'muted'));
+        timeline.append(item);
+      }
+      const submission = element('li');
+      submission.append(element('time', formatTime(progress.submitted_on) || '日期待补充'), element('strong', '已提交申请'));
+      timeline.append(submission);
+      section.append(timeline);
+      return section;
+    }
+
+    function syncProgressFields() {
+      const kind = $('progress-kind').value;
+      const round = $('round-field').querySelector('input');
+      const schedule = $('schedule-field').querySelector('input');
+      round.disabled = $('round-field').hidden = !kind.startsWith('interview_');
+      schedule.disabled = $('schedule-field').hidden = kind !== 'interview_scheduled';
+      schedule.required = !schedule.disabled;
+      schedule.min = $('progress-date').value;
+    }
+
+    function openProgress(job) {
+      if (saving) return;
+      progressJobId = job.id;
+      $('progress-form').reset();
+      $('progress-job').textContent = [job.company, job.role].filter(Boolean).join(' / ');
+      const placeholder = element('option', '选择事件');
+      placeholder.value = '';
+      placeholder.disabled = true;
+      const options = Object.entries(state.recruiting_event_types).map(([value, label]) => {
+        const option = element('option', label);
+        option.value = value;
+        return option;
+      });
+      $('progress-kind').replaceChildren(placeholder, ...options);
+      $('progress-kind').value = '';
+      $('progress-date').max = state.today;
+      $('progress-date').min = job.recruiting.submitted_on || '';
+      $('progress-date').value = state.today;
+      $('progress-error').hidden = true;
+      syncProgressFields();
+      $('progress-dialog').showModal();
+    }
+
+    async function saveProgress(event) {
+      event.preventDefault();
+      if (saving) return;
+      const form = $('progress-form');
+      const payload = Object.fromEntries(new FormData(form));
+      payload.job_id = progressJobId;
+      if (payload.round) payload.round = Number(payload.round);
+      else delete payload.round;
+      const buttons = [...form.querySelectorAll('button')];
+      const error = $('progress-error');
+      error.hidden = true;
+      saving = true;
+      buttons.forEach(button => { button.disabled = true; });
+      syncRefresh();
+      try {
+        const response = await fetch('/api/recruiting-events', {
+          method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || '请稍后重试。');
+        state = data;
+        $('progress-dialog').close();
+        renderList();
+        notice('招聘进展已保存。');
+      } catch (failure) {
+        error.textContent = `保存失败。${failure.message}`;
+        error.hidden = false;
+      } finally {
+        saving = false;
+        buttons.forEach(button => { button.disabled = false; });
+        syncRefresh();
+      }
+    }
+
+    function renderQuestions(job) {
+      const canEdit = !submittedStates.has(job.state);
+      const section = block('申请问题', 'question-section');
+      const save = element('button', '保存答案', 'action');
+      save.type = 'button';
+      const message = element('span', undefined, 'answer-status');
+      message.setAttribute('role', 'status');
+      const inputs = [];
+      function syncSave() {
+        save.disabled = saving || !drafts.get(job.id)?.size;
+      }
+      for (const [index, question] of job.questions.entries()) {
+        const box = element('div', undefined, 'question');
+        const inputId = `answer-${index}`;
+        const label = element('label', question.text);
+        label.htmlFor = inputId;
+        box.append(label, element('p', `${question.required !== false ? '必填' : '可选'} / ${questionLabels[question.status] || '待回答'}`, 'muted'));
+        if (question.options?.length) box.append(element('p', `可选答案 ${question.options.join(' / ')}`, 'muted'));
+        if (question.limit) box.append(element('p', `原站长度限制 ${question.limit}`, 'muted'));
+        const source = link('查看问题来源', question.source_url);
+        if (source) box.append(source);
+        const input = element('textarea');
+        input.id = inputId;
+        input.value = drafts.get(job.id)?.get(question.id)?.answer ?? question.answer ?? '';
+        input.readOnly = !canEdit;
+        inputs.push(input);
+        input.addEventListener('input', () => {
+          if (!drafts.has(job.id)) drafts.set(job.id, new Map());
+          const edits = drafts.get(job.id);
+          const original = edits.get(question.id)?.expected_answer ?? question.answer ?? '';
+          if (input.value === original) edits.delete(question.id);
+          else edits.set(question.id, {answer: input.value, expected_answer: original});
+          message.classList.remove('error-text');
+          message.textContent = edits.size ? '有未保存的修改' : '';
+          syncSave();
+          syncRefresh();
+        });
+        box.append(input);
+        section.append(box);
+      }
+      if (canEdit) {
+        const actions = element('div', undefined, 'actions');
+        actions.append(save, message);
+        section.append(actions);
+        if (drafts.get(job.id)?.size) message.textContent = '有未保存的修改';
+        syncSave();
+        save.addEventListener('click', async () => {
+          if (saving || !drafts.get(job.id)?.size) return;
+          saving = true;
+          syncSave();
+          syncRefresh();
+          inputs.forEach(input => { input.readOnly = true; });
+          message.classList.remove('error-text');
+          message.textContent = '正在保存…';
+          const answers = [...drafts.get(job.id)].map(([id, value]) => ({id, ...value}));
+          try {
+            const response = await fetch('/api/answers', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({job_id: job.id, answers}),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(response.status === 409
+              ? '岗位或答案已在其他地方更新。本页仍保留你的编辑。' : '请稍后重试。');
+            drafts.delete(job.id);
+            state = data;
+            detailSignature = undefined;
+            renderOverview();
+            renderList();
+            notice('答案已保存。回到对话发送「继续回填」。');
+          } catch (error) {
+            notice(`保存失败。${error.message}`, true);
+            message.textContent = '保存失败，修改仍在本页';
+            message.classList.add('error-text');
+          } finally {
+            saving = false;
+            inputs.forEach(input => { input.readOnly = false; });
+            syncSave();
+            syncRefresh();
+            $('detail').querySelector('.question-section button')?.dispatchEvent(new Event('answer-state-changed'));
+          }
+        });
+        save.addEventListener('answer-state-changed', syncSave);
+      }
+      return section;
+    }
+
+    async function refresh(manual = false) {
+      if (loading || saving || hasDrafts()) return;
+      loading = true;
+      syncRefresh();
+      try {
+        const response = await fetch('/api/state');
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+        if (saving || hasDrafts()) return;
+        if (!initialized || JSON.stringify(data) !== JSON.stringify(state)) {
+          initialized = true;
+          state = data;
+          renderOverview();
+          renderList();
+        }
+        if (manual || $('notice').classList.contains('error')) notice();
+      } catch {
+        notice('无法读取岗位记录。确认本地服务已启动后，点击「刷新记录」。', true);
+        if (!initialized) $('jobs').replaceChildren(element('li', '岗位记录暂时无法读取。', 'empty'));
+      } finally {
+        loading = false;
+        syncRefresh();
+      }
+    }
+
+    $('refresh').addEventListener('click', () => refresh(true));
+    $('progress-form').addEventListener('submit', saveProgress);
+    $('progress-kind').addEventListener('change', syncProgressFields);
+    $('progress-date').addEventListener('change', syncProgressFields);
+    $('progress-cancel').addEventListener('click', () => $('progress-dialog').close());
+    $('progress-dialog').addEventListener('cancel', event => { if (saving) event.preventDefault(); });
+    $('search').addEventListener('input', renderList);
+    for (const button of filters) {
+      button.addEventListener('click', () => {
+        filter = button.dataset.filter;
+        showingMobileDetail = false;
+        renderList();
+      });
+    }
+    $('back').addEventListener('click', () => {
+      showingMobileDetail = false;
+      $('workspace').classList.remove('mobile-open');
+      [...$('jobs').querySelectorAll('button')].find(button => button.dataset.job === selectedId)?.focus();
+    });
+    refresh();
+    setInterval(() => {
+      if (!$('progress-dialog').open && !document.querySelector('#detail details[open]') && !$('detail').contains(document.activeElement)) refresh();
+    }, 5000);
+  </script>
+</body>
+</html>

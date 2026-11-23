@@ -1,0 +1,4 @@
+interface:
+  display_name: "求职申请工作流"
+  short_description: "批量预填求职表单、集中待答题，逐岗准备到用户复核提交"
+  default_prompt: "使用 $job-application-workflow 处理这批岗位，读取最新 profile，更新看板并准备到最终复核。"
