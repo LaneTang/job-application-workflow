@@ -13,6 +13,8 @@ With this skill, you no longer have to tell every company where you study, what 
 
 ### By this skill alone, make your career life 10 times easier!
 
+![Job application workflow: job list, resume and profile inputs; agent fills forms and collects questions; you answer in one dashboard; agent fills answers; you review and submit](assets/workflow-sop-en.png)
+
 ### Reminder
 
 This skill requires computer use / browser use capabilities. I have only tested it with GPT, where it has worked very well for me. I use the Edge browser, which **requires the ChatGPT browser extension**.

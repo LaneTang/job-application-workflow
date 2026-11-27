@@ -13,6 +13,8 @@
 
 ### By this skill alone, make your career life 10 times easier!
 
+![求职申请流程：岗位清单、Resume 与 Profile 输入，Agent 预填并收集问题，用户集中回答，Agent 回填，用户复核并提交](assets/workflow-sop-en.png)
+
 ### Reminder
 
 这个skill会涉及到 Computer Use / Browser Use 的使用，我只在 GPT 上测试过，GPT用着很舒服。我使用的是 Edge 浏览器，**需要安装 ChatGPT 插件**。
