@@ -45,6 +45,23 @@ class ApplicationRecordsTests(unittest.TestCase):
             self.store.upsert({'id': self.job_id, 'state': 'filling'})
         self.assertTrue((Path(self.workspace.name) / 'applications/README.md').is_file())
 
+    def test_submission_answers_remain_frozen_after_record_edits(self):
+        evidence = {'kind': 'user_confirmation', 'text': 'Confirmed', 'observed_at': '2020-01-01T12:00:00Z'}
+        self.store.upsert({'id': self.job_id, 'blockers': ['Missing confirmation'], 'questions': [{'id': 'salary', 'text': 'Salary?', 'answer': '$35/hour'}], 'fields': [{'label': 'Name', 'value': 'Example'}]})
+        submitted = self.store.upsert({'id': self.job_id, 'state': 'submitted', 'blockers': [], 'submission_evidence': evidence})['jobs'][0]
+        self.assertEqual(submitted['state'], 'submitted')
+        snapshot = submitted['submission_snapshot']
+        changed = self.store.upsert({'id': self.job_id, 'questions': [{'id': 'salary', 'answer': '$40/hour'}], 'fields': [{'label': 'Name', 'value': 'Changed'}]})['jobs'][0]
+        self.assertEqual(changed['submission_snapshot'], snapshot)
+        self.assertEqual(snapshot['questions'][0]['answer'], '$35/hour')
+        with self.assertRaises(ValueError):
+            self.store.upsert({'id': self.job_id, 'submission_snapshot': {}})
+
+    def test_legacy_submission_is_not_backfilled_as_a_historical_snapshot(self):
+        legacy = {'id': self.job_id, 'state': 'submitted', 'questions': [], 'fields': [], 'submission_evidence': {'text': 'Old submission', 'observed_at': '2020-01-01T12:00:00Z'}}
+        updated = dashboard.merge_job(legacy, {'id': self.job_id, 'notes': ['Later note']})
+        self.assertNotIn('submission_snapshot', updated)
+
     def test_ghost_threshold_and_waiting_for_candidate(self):
         job = {'state': 'submitted', 'submitted_at': '2020-01-01'}
         zone = ZoneInfo('UTC')

@@ -119,8 +119,16 @@ python3 "$SKILL_DIR/scripts/dashboard.py" --workspace "$WORKSPACE" serve --port 
 
 ## English dashboard filters
 
-The dashboard UI is in English; user-entered questions, notes and source evidence retain their original language. Filters appear in this order: All, need refill, ready to go, submitted, rejected, ghost, interview invited, done interview, more round, offered.
+The dashboard UI is in English; user-entered questions, notes and source evidence retain their original language. Filters appear in this order: All, need refill, something wrong, ready to go, submitted, rejected, ghost, interview invited, done interview, more round, offered.
 
-Each job belongs to exactly one filter besides All. Rejected and offered outcomes take precedence, followed by Ghost, interview progress, submitted, ready to go and need refill. `need refill` includes queued, blocked and unresolved jobs even when no unanswered questions have been registered. `submitted` excludes the separately classified recruiting stages and outcomes; assessments remain here with an Assessment comment. `done interview` denotes a completed first or unspecified round; `more round` denotes a known round greater than one, with the round number and event shown in the row comment and timeline. Offers include accepted or declined offers; original events remain in the timeline. Closed and withdrawn records retain their specific state in comments. No underlying application state or evidence is rewritten by filtering.
+Each job belongs to exactly one filter besides All. Rejected and offered outcomes take precedence, followed by Ghost, interview progress, submitted, unresolved preparation issues, ready to go and missing answers. `need refill` contains only jobs with unanswered required questions and no separate blocking issue; `something wrong` contains other incomplete or blocked applications. `submitted` excludes the separately classified recruiting stages and outcomes; assessments remain here with an Assessment comment. `done interview` denotes a completed first or unspecified round; `more round` denotes a known round greater than one, with the round number and event shown in the row comment and timeline. Offers include accepted or declined offers; original events remain in the timeline. Closed and withdrawn records retain their specific state in comments. No underlying application state or evidence is rewritten by filtering.
 
 Run `node tests/test_dashboard_filters.cjs` to validate frontend syntax and classification alongside the Python tests.
+
+## Submission answer history
+
+The dashboard shows each job’s recorded submission date and an Application answers overlay. When submission is first recorded with evidence, the store automatically preserves `submission_snapshot` (questions, standard fields, notes, resume version and capture time). Later record edits do not replace this snapshot; ordinary patches cannot overwrite it. Legacy applications without a snapshot show available local records with an explicit historical-completeness notice. Missing or redacted values are never reconstructed from the current profile.
+
+## Preparation issues
+
+`need refill` contains only applications missing required answers. Other incomplete applications appear under `something wrong`. An optional `application_issue` object records `kind` (`verification`, `technical`, `deferred`, or `mismatch`), `reason`, `action` (the recommended next step), and optional `retry_after`. This is a preparation issue, not an employer rejection or a decision to withdraw. It prevents ready-to-go status. Submitted and recruiting stages take precedence over old preparation issues. Resolve the issue explicitly with `application_issue: null` after checking the dependency, then reverify readiness.

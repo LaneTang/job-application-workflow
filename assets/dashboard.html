@@ -446,6 +446,26 @@
       .chart-hint {grid-column:2;align-self:start;margin-top:8px;}
     }
     @media(prefers-reduced-motion:reduce) {#status-pie > path,#status-pie > circle {transition:none;}}
+    .issue-next {display:block;font-size:12px;line-height:1.45;margin-top:10px;color:#8c371e;max-width:60ch;}
+    .job[aria-current="true"] .issue-next {color:#f3c19d;}
+    .application-issue {background:#fff0e4;border-left:4px solid #bb562b;}
+    .row-state small {white-space:normal;max-width:20ch;}
+    .job-footer {display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px 13px;background:white;}
+    .submission-date {font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;}
+    .answers-button {padding:5px 9px;font-size:11px;border:1px solid var(--line);background:transparent;color:var(--ink);}
+    .answers-button:hover {border-color:black;background:var(--paper);}
+    #answers-dialog {width:min(780px,calc(100vw - 32px));max-height:85dvh;padding:0;border:1px solid black;box-shadow:8px 8px 0 #d8d8ce;background:var(--paper);}
+    .answers-heading {position:sticky;top:0;z-index:1;background:var(--paper);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;border-bottom:1px solid var(--line);}
+    .answers-heading h2 {font-size:22px;letter-spacing:-.04em;}
+    #answers-content {padding:24px;overflow-wrap:anywhere;}
+    #answers-content h3 {font-size:18px;line-height:1.3;margin-bottom:8px;}
+    .answers-notice {margin:18px 0;padding:12px 14px;background:#f8e7b6;font-size:13px;}
+    .answer-record {padding:16px 0;border-bottom:1px solid var(--line);}
+    .answer-record h4 {font-size:14px;line-height:1.5;margin-bottom:8px;}
+    .answer-value {white-space:pre-wrap;font-size:14px;}
+    .answer-meta {font-size:11px;color:var(--muted);margin-top:8px;}
+    .answer-group {font-size:16px;margin-top:24px;}
+    @media(max-width:680px){.job-footer{padding-inline:14px;}#answers-content{padding:18px;}.answers-heading{padding:16px 18px;}}
   </style>
 </head>
 <body>
@@ -476,6 +496,7 @@
           <div class="filters" role="group" aria-label="Filter applications">
             <button class="filter" type="button" data-filter="all" aria-pressed="true">All<span></span></button>
             <button class="filter" type="button" data-filter="pending" aria-pressed="false">need refill<span></span></button>
+            <button class="filter" type="button" data-filter="wrong" aria-pressed="false">something wrong<span></span></button>
             <button class="filter" type="button" data-filter="ready" aria-pressed="false">ready to go<span></span></button>
             <button class="filter" type="button" data-filter="submitted" aria-pressed="false">submitted<span></span></button>
             <button class="filter" type="button" data-filter="rejected" aria-pressed="false">rejected<span></span></button>
@@ -494,6 +515,10 @@
       </section>
     </div>
   </main>
+  <dialog id="answers-dialog" aria-labelledby="answers-title">
+    <div class="answers-heading"><h2 id="answers-title">Application answers</h2><button id="answers-close" class="quiet-button" type="button" autofocus>Close</button></div>
+    <div id="answers-content"></div>
+  </dialog>
   <dialog id="progress-dialog" aria-labelledby="progress-title">
     <form class="progress-form" id="progress-form">
       <h2 id="progress-title">Record recruiting progress</h2>
@@ -585,13 +610,18 @@
 
     function status(job) {
       const category = applicationCategory(job);
-      const names = {pending: 'need refill', ready: 'ready to go', submitted: 'submitted', rejected: 'rejected', ghost: 'ghost', invited: 'interview invited', done: 'done interview', round: 'more round', offered: 'offered'};
+      const names = {pending: 'need refill', wrong: 'something wrong', ready: 'ready to go', submitted: 'submitted', rejected: 'rejected', ghost: 'ghost', invited: 'interview invited', done: 'done interview', round: 'more round', offered: 'offered'};
       const badge = element('span', names[category], 'badge');
-      badge.dataset.state = job.state;
+      badge.dataset.state = category === 'wrong' ? 'blocked' : job.state;
       return [badge];
     }
 
+    function issueLabel(job) {
+      return ({verification:'Verification needed',technical:'Technical blocker',deferred:'On hold',mismatch:'Role mismatch'})[job.application_issue?.kind] || 'Preparation incomplete';
+    }
+
     function reviewHint(job) {
+      if (applicationCategory(job) === 'wrong') return issueLabel(job);
       if (['round', 'done', 'invited'].includes(applicationCategory(job))) return ((job.recruiting?.events?.[0]) ? progressLabel(job.recruiting.events[0]) : labels[job.state] || job.state);
       if (job.state === 'assessment') return 'Assessment';
       if (job.state === 'closed' || job.state === 'withdrawn') return labels[job.state];
@@ -614,8 +644,10 @@
         return 'invited';
       }
       if (submittedStates.has(job.state)) return 'submitted';
+      if (job.application_issue) return 'wrong';
       if (job.ready_to_go) return 'ready';
-      return 'pending';
+      const unanswered = (job.questions || []).some(question => question.required !== false && question.status !== 'skipped' && !String(question.answer ?? '').trim());
+      return unanswered && job.state !== 'blocked' ? 'pending' : 'wrong';
     }
 
     function matches(job, value) {
@@ -628,7 +660,7 @@
 
     function renderOverview() {
       const groups = [
-        ['pending','need refill','#858b94'], ['ready','ready to go','#61789e'],
+        ['pending','need refill','#858b94'], ['wrong','something wrong','#c87953'], ['ready','ready to go','#61789e'],
         ['submitted','submitted','#638cc2'], ['rejected','rejected','#b88f91'],
         ['ghost','ghost','#b9b8bd'], ['invited','interview invited','#43a6ac'],
         ['done','done interview','#47b98c'], ['round','more round','#9bcb62'],
@@ -673,6 +705,58 @@
       }
     }
 
+    function submissionDate(job) {
+      return job.submitted_at || job.recruiting?.submitted_on || job.confirmation_received_at || null;
+    }
+
+    function submissionDateLabel(job) {
+      const date = submissionDate(job);
+      if (date) return `Submitted ${formatTime(date, !/^\d{4}-\d{2}-\d{2}$/.test(date))}`;
+      if (job.status_confidence === 'imported_unverified' || /Submission unverified/i.test(reviewHint(job) || '')) return 'Submission unverified';
+      return job.submission_evidence || submittedStates.has(job.state) ? 'Submission date unknown' : 'Not submitted';
+    }
+
+    function recordedValue(value) {
+      if (value == null || String(value).trim() === '') return 'No answer retained';
+      if (/^<redacted>$/i.test(String(value).trim())) return 'Value not retained';
+      return String(value);
+    }
+
+    function openAnswers(job) {
+      const content = $('answers-content');
+      content.replaceChildren();
+      const snapshot = job.submission_snapshot;
+      const record = snapshot || job;
+      content.append(element('h3', `${job.company || 'Company'} — ${job.role || 'Role'}`));
+      content.append(element('p', submissionDateLabel(job), 'muted'));
+      const submitted = Boolean(job.submission_evidence) || submittedStates.has(job.state);
+      content.append(element('p', snapshot
+        ? 'Values preserved when submission was recorded. This record may not include every field completed on the employer website.'
+        : submitted
+          ? 'No submission-time snapshot was saved for this application. These are the available local records; they may be incomplete or reflect later changes.'
+          : 'Draft answers only. This application has not been recorded as submitted.', 'answers-notice'));
+      if (record.resume_path) content.append(element('p', `Resume: ${record.resume_path.split('/').pop()}`, 'muted'));
+      const groups = [['Questions', record.questions || []], ['Standard fields', record.fields || []]];
+      for (const [title, items] of groups) {
+        content.append(element('h4', title, 'answer-group'));
+        if (!items.length) {content.append(element('p', 'No entries retained in the local record.', 'muted'));continue;}
+        for (const item of items) {
+          const entry = element('section', undefined, 'answer-record');
+          entry.append(element('h4', item.text || item.label || item.id || 'Field'));
+          entry.append(element('p', recordedValue(title === 'Questions' ? item.answer : item.value), 'answer-value'));
+          const meta = title === 'Questions' ? questionLabels[item.status] || 'Verification not recorded' : item.verified ? 'Verified in form' : 'Verification not recorded';
+          entry.append(element('p', meta, 'answer-meta'));
+          content.append(entry);
+        }
+      }
+      if (record.notes?.length) {
+        const notes = disclosure('Recorded context and answer notes');
+        listItems(notes, record.notes);
+        content.append(notes);
+      }
+      $('answers-dialog').showModal();
+    }
+
     function renderList() {
       for (const button of filters) {
         button.setAttribute('aria-pressed', String(button.dataset.filter === filter));
@@ -693,6 +777,7 @@
         row.dataset.job = job.id;
         const leading = element('span');
         leading.append(element('strong', job.role || 'Role unverified', 'role'), element('span', job.company || 'Company unverified', 'company'));
+        if (applicationCategory(job) === 'wrong') leading.append(element('span', job.application_issue?.action || 'Finish preparation and verify the form before submitting.', 'issue-next'));
         const trailing = element('span', undefined, 'row-state');
         trailing.append(...status(job));
         const hint = reviewHint(job);
@@ -701,13 +786,20 @@
         arrow.setAttribute('aria-hidden', 'true');
         row.append(leading, trailing, arrow);
         row.addEventListener('click', () => selectJob(job.id, true));
-        item.append(row);
+        const footer = element('div', undefined, 'job-footer');
+        footer.append(element('time', submissionDateLabel(job), 'submission-date'));
+        const answers = element('button', 'Application answers', 'answers-button');
+        answers.type = 'button';
+        answers.setAttribute('aria-label', `Application answers for ${job.company || 'company'} — ${job.role || 'role'}`);
+        answers.addEventListener('click', () => openAnswers(job));
+        footer.append(answers);
+        item.append(row, footer);
         rows.append(item);
       }
       if (!visible.length) {
         const empty = element('li', undefined, 'empty');
         const title = query.length ? 'No matching jobs' : ({
-          all: 'No applications yet', pending: 'No applications need refilling', ready: 'No applications ready for review', submitted: 'No submitted applications',
+          all: 'No applications yet', pending: 'No applications are missing required answers', wrong: 'No applications with unresolved issues', ready: 'No applications ready for review', submitted: 'No submitted applications',
           rejected: 'No rejections', invited: 'No interview invitations', done: 'No completed interviews', round: 'No additional rounds', offered: 'No offers', ghost: 'No applications waiting over 21 days',
         })[filter];
         empty.append(element('strong', title));
@@ -795,6 +887,16 @@
       ]);
       if (job.ready_to_go) heading.append(element('p', 'Review and submit on the original application website.', 'intro followup'));
       detail.append(heading);
+      if (applicationCategory(job) === 'wrong') {
+        const issue = block('Next step', 'application-issue');
+        entries(issue, [
+          ['Issue', issueLabel(job)],
+          ['Problem', job.application_issue?.reason || (job.blockers || []).join(' ') || 'Form preparation or verification has not been completed.'],
+          ['Recommendation', job.application_issue?.action || 'Finish preparation and verify the form before submitting.'],
+          ['Revisit after', job.application_issue?.retry_after],
+        ]);
+        detail.append(issue);
+      }
 
       const tracking = block('Track application', 'tracking');
       const progress = job.tracking || {};
@@ -811,7 +913,7 @@
 
       const record = block('Application status');
       entries(record, [
-        ['Submission date', formatTime(job.submitted_at)],
+        ['Submission date', submissionDateLabel(job)],
         ['Last checked', formatTime(job.checked_at)],
         ['Status source', job.status_source?.label],
         ['Posting status', job.posting_status],
@@ -1078,6 +1180,8 @@
       }
     }
 
+    $('answers-close').addEventListener('click', () => $('answers-dialog').close());
+    $('answers-dialog').addEventListener('click', event => { if (event.target === $('answers-dialog')) {const rect = event.target.getBoundingClientRect();if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) event.target.close();} });
     $('refresh').addEventListener('click', () => refresh(true));
     $('progress-form').addEventListener('submit', saveProgress);
     $('progress-kind').addEventListener('change', syncProgressFields);
@@ -1099,7 +1203,7 @@
     });
     refresh();
     setInterval(() => {
-      if (!$('progress-dialog').open && !document.querySelector('#detail details[open]') && !$('detail').contains(document.activeElement)) refresh();
+      if (!$('answers-dialog').open && !$('progress-dialog').open && !document.querySelector('#detail details[open]') && !$('detail').contains(document.activeElement)) refresh();
     }, 5000);
   </script>
 </body>

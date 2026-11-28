@@ -194,6 +194,7 @@ def summarize(job):
         job.get("state") == "ready_for_review"
         and all(job.get("verification", {}).get(key) is True for key in VERIFICATION_KEYS)
         and not job.get("blockers")
+        and not job.get("application_issue")
         and all(
             not question.get("required", True) or question.get("status") == "applied"
             for question in questions
@@ -217,6 +218,8 @@ def merge_job(existing, patch):
         "fields": [], "blockers": [], "notes": [],
         "verification": dict.fromkeys(VERIFICATION_KEYS, False),
     })
+    if "submission_snapshot" in patch:
+        raise ValueError("Submission snapshots are created automatically and cannot be overwritten")
     incoming_questions = patch.pop("questions", [])
     old_content = copy.deepcopy({key: job.get(key) for key in (
         "fields", "questions", "blockers", "resume_path", "apply_url",
@@ -240,11 +243,17 @@ def merge_job(existing, patch):
             question["status"] = "answered" if question["answer"].strip() else "awaiting_answer"
     job.update(patch)
     changed = any(job.get(key) != value for key, value in old_content.items())
-    if existing and changed and existing.get("state") not in POST_SUBMISSION_STATES:
+    if existing and changed and existing.get("state") not in POST_SUBMISSION_STATES and job.get("state") not in POST_SUBMISSION_STATES:
         clear_ready(job)
     if existing and existing.get("state") in POST_SUBMISSION_STATES and job.get("state") not in POST_SUBMISSION_STATES:
         raise Conflict("A submitted record cannot be reopened through an ordinary update")
     timestamp = now()
+    if job.get("submission_evidence") and job.get("state") in POST_SUBMISSION_STATES and not (existing or {}).get("submission_evidence") and (not existing or existing.get("state") not in POST_SUBMISSION_STATES):
+        job["submission_snapshot"] = {
+            "captured_at": timestamp,
+            "submitted_at": job.get("submitted_at"),
+            **copy.deepcopy({key: job.get(key) for key in ("questions", "fields", "notes", "resume_path", "resume_sha256")}),
+        }
     changed_fields = sorted(
         key for key in set(job) - {"history", "updated_at", "ready_to_go", "pending_question_count"}
         if existing is None or job.get(key) != existing.get(key)

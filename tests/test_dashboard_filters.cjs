@@ -8,8 +8,14 @@ const context = {submittedStates: new Set(['submitted','rejected','withdrawn','o
 vm.createContext(context);
 vm.runInContext(code.slice(code.indexOf('    function applicationCategory'), code.indexOf('    function sortTime')), context);
 const cases = [
- [{state:'queued',pending_question_count:0}, 'pending'],
- [{state:'needs_review',pending_question_count:0}, 'pending'],
+ [{state:'waiting_for_user',questions:[{required:true,answer:'',status:'awaiting_answer'}]}, 'pending'],
+ [{state:'waiting_for_user',questions:[{required:true,answer:'Yes',status:'answered'}]}, 'wrong'],
+ [{state:'waiting_for_user',questions:[{required:false,answer:''}]}, 'wrong'],
+ [{state:'blocked',questions:[{required:true,answer:''}]}, 'wrong'],
+ [{state:'filling',application_issue:{kind:'verification'}}, 'wrong'],
+ [{state:'submitted',application_issue:{kind:'verification'}}, 'submitted'],
+ [{state:'queued',pending_question_count:0}, 'wrong'],
+ [{state:'needs_review',pending_question_count:0}, 'wrong'],
  [{state:'ready_for_review',ready_to_go:true}, 'ready'],
  [{state:'submitted'}, 'submitted'],
  [{state:'rejected',recruiting:{ghost:true}}, 'rejected'],
