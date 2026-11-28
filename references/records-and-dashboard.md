@@ -116,3 +116,11 @@ python3 "$SKILL_DIR/scripts/dashboard.py" --workspace "$WORKSPACE" serve --port 
 ## 配置时区
 
 新账本未指定时区时使用 UTC。使用者可在停止服务后，为 `applications/applications.json` 顶层设置 IANA `timezone`，例如 `Europe/London` 或 `America/New_York`，再重启服务。不要覆盖已有岗位数据。Ghost 标记在读取账本时按该时区重算。
+
+## English dashboard filters
+
+The dashboard UI is in English; user-entered questions, notes and source evidence retain their original language. Filters appear in this order: All, need refill, ready to go, submitted, rejected, ghost, interview invited, done interview, more round, offered.
+
+Each job belongs to exactly one filter besides All. Rejected and offered outcomes take precedence, followed by Ghost, interview progress, submitted, ready to go and need refill. `need refill` includes queued, blocked and unresolved jobs even when no unanswered questions have been registered. `submitted` excludes the separately classified recruiting stages and outcomes; assessments remain here with an Assessment comment. `done interview` denotes a completed first or unspecified round; `more round` denotes a known round greater than one, with the round number and event shown in the row comment and timeline. Offers include accepted or declined offers; original events remain in the timeline. Closed and withdrawn records retain their specific state in comments. No underlying application state or evidence is rewritten by filtering.
+
+Run `node tests/test_dashboard_filters.cjs` to validate frontend syntax and classification alongside the Python tests.

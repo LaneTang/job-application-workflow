@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>申请记录 | 求职工作台</title>
+  <title>Applications | Job Search Workspace</title>
   <style>
     :root {
       color-scheme: light;
@@ -234,13 +234,13 @@
         <div class="brand-mark" aria-hidden="true">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h14V4h-3M9 3h6v4H9zM8 11h8M8 15h5"/></svg>
         </div>
-        求职工作台
+        Job Search Workspace
       </div>
       <div class="bar-actions">
-        <span class="local">本地账本</span>
+        <span class="local">Local records</span>
         <button class="quiet-button" id="refresh" type="button">
           <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-13.7-5.6L4 8m0-5v5h5M4 13a8 8 0 0 0 13.7 5.6L20 16m0 5v-5h-5"/></svg>
-          刷新记录
+          Refresh records
         </button>
       </div>
     </div>
@@ -248,11 +248,11 @@
   <main class="wrap">
     <section class="overview" aria-labelledby="page-title">
       <div>
-        <h1 id="page-title">申请记录</h1>
-        <p class="intro">按公司、岗位或编号查重，回看投递与跟进记录。</p>
+        <h1 id="page-title">Applications</h1>
+        <p class="intro">Find duplicates and review applications and follow-ups by company, role or ID.</p>
       </div>
       <div class="pipeline">
-        <div class="pipeline-head"><strong>投递分布</strong><span id="total">读取中</span></div>
+        <div class="pipeline-head"><strong>Application overview</strong><span id="total">Loading</span></div>
         <div id="track" class="track" aria-hidden="true"></div>
         <div id="legend" class="legend"></div>
       </div>
@@ -261,54 +261,60 @@
     <div class="workspace" id="workspace">
       <section class="roster" aria-labelledby="roster-title">
         <div class="roster-head">
-          <div class="roster-title"><h2 id="roster-title">岗位列表</h2><span id="result-count" class="count" aria-live="polite"></span></div>
+          <div class="roster-title"><h2 id="roster-title">Jobs</h2><span id="result-count" class="count" aria-live="polite"></span></div>
           <label class="search">
             <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 4 4"/></svg>
-            <span class="sr-only">搜索公司、岗位或编号</span>
-            <input id="search" type="search" placeholder="搜索公司、岗位或编号" autocomplete="off">
+            <span class="sr-only">Search company, role or ID</span>
+            <input id="search" type="search" placeholder="Search company, role or ID" autocomplete="off">
           </label>
-          <div class="filters" role="group" aria-label="筛选岗位">
-            <button class="filter" type="button" data-filter="all" aria-pressed="true">全部<span></span></button>
-            <button class="filter" type="button" data-filter="pending" aria-pressed="false">待回填<span></span></button>
-            <button class="filter" type="button" data-filter="ready" aria-pressed="false">待复核<span></span></button>
-            <button class="filter" type="button" data-filter="submitted" aria-pressed="false">已投递<span></span></button>
-            <button class="filter" type="button" data-filter="recruiting" aria-pressed="false">面试 / 测评<span></span></button>
-            <button class="filter" type="button" data-filter="ghost" aria-pressed="false">Ghost<span></span></button>
+          <div class="filters" role="group" aria-label="Filter applications">
+            <button class="filter" type="button" data-filter="all" aria-pressed="true">All<span></span></button>
+            <button class="filter" type="button" data-filter="pending" aria-pressed="false">need refill<span></span></button>
+            <button class="filter" type="button" data-filter="ready" aria-pressed="false">ready to go<span></span></button>
+            <button class="filter" type="button" data-filter="submitted" aria-pressed="false">submitted<span></span></button>
+            <button class="filter" type="button" data-filter="rejected" aria-pressed="false">rejected<span></span></button>
+            <button class="filter" type="button" data-filter="ghost" aria-pressed="false">ghost<span></span></button>
+            <button class="filter" type="button" data-filter="invited" aria-pressed="false">interview invited<span></span></button>
+            <button class="filter" type="button" data-filter="done" aria-pressed="false">done interview<span></span></button>
+            <button class="filter" type="button" data-filter="round" aria-pressed="false">more round<span></span></button>
+            <button class="filter" type="button" data-filter="offered" aria-pressed="false">offered<span></span></button>
           </div>
         </div>
-        <ul id="jobs" class="jobs"><li class="empty">正在读取岗位记录…</li></ul>
+        <ul id="jobs" class="jobs"><li class="empty">Loading applications…</li></ul>
       </section>
-      <section class="dossier" aria-label="岗位详情">
-        <button id="back" class="quiet-button back" type="button">‹ 返回岗位列表</button>
-        <div id="detail" class="empty">选择岗位，查看申请详情。</div>
+      <section class="dossier" aria-label="Application details">
+        <button id="back" class="quiet-button back" type="button">‹ Back to jobs</button>
+        <div id="detail" class="empty">Select a job to view its application.</div>
       </section>
     </div>
   </main>
   <dialog id="progress-dialog" aria-labelledby="progress-title">
     <form class="progress-form" id="progress-form">
-      <h2 id="progress-title">记录招聘进展</h2>
+      <h2 id="progress-title">Record recruiting progress</h2>
       <p id="progress-job" class="muted"></p>
-      <label>事件<select id="progress-kind" name="kind" required></select></label>
-      <label>发生日期<input id="progress-date" name="date" type="date" required></label>
-      <label id="round-field" hidden>面试轮次（选填）<input name="round" type="number" min="1" step="1" placeholder="例如 2"></label>
-      <label id="schedule-field" hidden>安排的面试日期<input name="scheduled_for" type="date"></label>
-      <label>备注（选填）<textarea name="note" maxlength="2000" rows="2"></textarea></label>
+      <label>Event<select id="progress-kind" name="kind" required></select></label>
+      <label>Event date<input id="progress-date" name="date" type="date" required></label>
+      <label id="round-field" hidden>Interview round (optional)<input name="round" type="number" min="1" step="1" placeholder="e.g. 2"></label>
+      <label id="schedule-field" hidden>Scheduled interview date<input name="scheduled_for" type="date"></label>
+      <label>Notes (optional)<textarea name="note" maxlength="2000" rows="2"></textarea></label>
       <p id="progress-error" class="error-text" role="alert" hidden></p>
       <div class="actions">
-        <button class="action" type="submit">保存进展</button>
-        <button class="quiet-button" id="progress-cancel" type="button">取消</button>
+        <button class="action" type="submit">Save progress</button>
+        <button class="quiet-button" id="progress-cancel" type="button">Cancel</button>
       </div>
     </form>
   </dialog>
   <script>
     const labels = {
-      queued: '待处理', checking: '核对中', filling: '填写中', waiting_for_user: '待补充',
-      ready_for_review: '待复核', submitted: '已提交', closed: '已关闭', needs_review: '需确认',
-      blocked: '受阻', interviewing: '面试中', offer: '已获 Offer', rejected: '已拒绝', withdrawn: '已撤回',
+      queued: 'Queued', checking: 'Checking', filling: 'Filling', waiting_for_user: 'Needs information',
+      ready_for_review: 'Ready for review', submitted: 'Submitted', closed: 'Closed', needs_review: 'Needs review',
+      blocked: 'Blocked', interviewing: 'Interviewing', offer: 'Offered', rejected: 'Rejected', withdrawn: 'Withdrawn',
     };
-    const eventLabels = {record_created: '建立记录', record_updated: '更新记录', answers_saved: '保存答案', recruiting_event_recorded: '保存招聘进展'};
-    const questionLabels = {awaiting_answer: '待回答', answered: '已回答，待回填', applied: '已回填', skipped: '已跳过'};
-    const identifierLabels = {job_id: '岗位编号', requisition_id: '招聘编号', publication_id: '发布编号', linkedin_id: 'LinkedIn 编号'};
+    const progressLabels = {interview_invited:'Interview invited', interview_scheduled:'Interview scheduled', interview_completed:'Interview completed', assessment_invited:'Assessment invited', assessment_completed:'Assessment completed', employer_reply:'Employer reply', action_requested:'Action requested', candidate_replied:'Candidate replied', offer:'Offer received', accepted:'Offer accepted', declined:'Offer declined', rejected:'Rejected', withdrawn:'Withdrawn'};
+    function progressLabel(event) { return `${event.round ? `Round ${event.round} · ` : ''}${progressLabels[event.kind] || event.kind}`; }
+    const eventLabels = {record_created: 'Record created', record_updated: 'Record updated', answers_saved: 'Save answers', recruiting_event_recorded: 'Recruiting progress recorded'};
+    const questionLabels = {awaiting_answer: 'Awaiting answer', answered: 'Answered, awaiting fill', applied: 'Filled and verified', skipped: 'Skipped'};
+    const identifierLabels = {job_id: 'Job ID', requisition_id: 'Requisition ID', publication_id: 'Posting ID', linkedin_id: 'LinkedIn ID'};
     const recruitingStates = new Set(['invited', 'interviewing', 'assessment']);
     const submittedStates = new Set(['submitted', 'offer', 'rejected', 'withdrawn', 'accepted', 'declined', ...recruitingStates]);
     const $ = id => document.getElementById(id);
@@ -353,7 +359,7 @@
       if (Number.isNaN(date.getTime())) return value;
       const options = {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: state.timezone || 'UTC'};
       if (withTime) Object.assign(options, {hour: '2-digit', minute: '2-digit', hourCycle: 'h23'});
-      return new Intl.DateTimeFormat('zh-CN', options).format(date);
+      return new Intl.DateTimeFormat('en-US', options).format(date);
     }
 
     function notice(text = '', error = false) {
@@ -368,29 +374,46 @@
 
     function syncRefresh() {
       $('refresh').disabled = loading || saving || hasDrafts();
-      $('refresh').title = hasDrafts() ? '请先保存已编辑的答案' : '';
+      $('refresh').title = hasDrafts() ? 'Save your edited answers first' : '';
     }
 
     function status(job) {
-      const badge = element('span', job.recruiting?.label || labels[job.state] || job.state, 'badge');
+      const category = applicationCategory(job);
+      const names = {pending: 'need refill', ready: 'ready to go', submitted: 'submitted', rejected: 'rejected', ghost: 'ghost', invited: 'interview invited', done: 'done interview', round: 'more round', offered: 'offered'};
+      const badge = element('span', names[category], 'badge');
       badge.dataset.state = job.state;
-      return job.recruiting?.ghost ? [badge, element('span', 'Ghost', 'badge ghost')] : [badge];
+      return [badge];
     }
 
     function reviewHint(job) {
-      if (job.status_confidence === 'imported_unverified') return '提交待核对';
-      if (job.status_confidence === 'company_confirmed_role_unverified') return '岗位待核对';
-      if (!submittedStates.has(job.state) && job.pending_question_count > 0) return `${job.pending_question_count} 题待回填`;
+      if (['round', 'done', 'invited'].includes(applicationCategory(job))) return ((job.recruiting?.events?.[0]) ? progressLabel(job.recruiting.events[0]) : labels[job.state] || job.state);
+      if (job.state === 'assessment') return 'Assessment';
+      if (job.state === 'closed' || job.state === 'withdrawn') return labels[job.state];
+      if (job.status_confidence === 'imported_unverified') return 'Submission unverified';
+      if (job.status_confidence === 'company_confirmed_role_unverified') return 'Role unverified';
+      if (!submittedStates.has(job.state) && job.pending_question_count > 0) return `${job.pending_question_count} answer(s) awaiting fill`;
       return '';
     }
 
+    function applicationCategory(job) {
+      if (job.state === 'rejected') return 'rejected';
+      if (['offer', 'accepted', 'declined'].includes(job.state)) return 'offered';
+      if (job.recruiting?.ghost) return 'ghost';
+      const interviews = (job.recruiting_events || []).filter(event => event.kind.startsWith('interview_'))
+        .slice().sort((a, b) => a.date.localeCompare(b.date) || (a.recorded_at || '').localeCompare(b.recorded_at || ''));
+      const last = interviews[interviews.length - 1];
+      if (['invited', 'interviewing'].includes(job.state)) {
+        if (last?.round > 1) return 'round';
+        if (last?.kind === 'interview_completed') return 'done';
+        return 'invited';
+      }
+      if (submittedStates.has(job.state)) return 'submitted';
+      if (job.ready_to_go) return 'ready';
+      return 'pending';
+    }
+
     function matches(job, value) {
-      if (value === 'pending') return !submittedStates.has(job.state) && job.pending_question_count > 0;
-      if (value === 'ready') return job.ready_to_go;
-      if (value === 'submitted') return submittedStates.has(job.state);
-      if (value === 'recruiting') return recruitingStates.has(job.state);
-      if (value === 'ghost') return Boolean(job.recruiting?.ghost);
-      return true;
+      return value === 'all' || applicationCategory(job) === value;
     }
 
     function sortTime(job) {
@@ -402,11 +425,11 @@
       const sent = state.jobs.filter(job => submittedStates.has(job.state)).length;
       const closed = state.jobs.filter(job => job.state === 'closed').length;
       const groups = [
-        ['sent', '已有提交记录', sent],
-        ['open', '未投递或待核对', all - sent - closed],
-        ['closed', '岗位关闭', closed],
+        ['sent', 'Submission recorded', sent],
+        ['open', 'Not submitted / unverified', all - sent - closed],
+        ['closed', 'Posting closed', closed],
       ];
-      $('total').textContent = `共 ${all} 个岗位`;
+      $('total').textContent = `${all} jobs total`;
       $('track').replaceChildren();
       $('legend').replaceChildren();
       $('track').toggleAttribute('data-ticks', all > 0 && all <= 60);
@@ -448,7 +471,7 @@
         const haystack = [job.company, job.role, job.location, job.id, job.recruiting?.label, ...Object.values(job.identifiers || {})].join(' ').toLocaleLowerCase();
         return matches(job, filter) && query.every(word => haystack.includes(word));
       }).sort((a, b) => sortTime(b) - sortTime(a));
-      $('result-count').textContent = `显示 ${visible.length} 个`;
+      $('result-count').textContent = `Showing ${visible.length}`;
       const previousFocus = document.activeElement?.dataset.job;
       const rows = document.createDocumentFragment();
       for (const job of visible) {
@@ -457,7 +480,7 @@
         row.type = 'button';
         row.dataset.job = job.id;
         const leading = element('span');
-        leading.append(element('strong', job.role || '岗位名称待核对', 'role'), element('span', job.company || '公司待核对', 'company'));
+        leading.append(element('strong', job.role || 'Role unverified', 'role'), element('span', job.company || 'Company unverified', 'company'));
         const trailing = element('span', undefined, 'row-state');
         trailing.append(...status(job));
         const hint = reviewHint(job);
@@ -471,13 +494,13 @@
       }
       if (!visible.length) {
         const empty = element('li', undefined, 'empty');
-        const title = query.length ? '没有匹配的岗位' : ({
-          all: '还没有岗位记录', pending: '暂无待回填岗位', ready: '暂无待复核岗位', submitted: '暂无投递记录',
-          recruiting: '暂无面试或测评记录', ghost: '暂无超过 21 天未收到回复的岗位',
+        const title = query.length ? 'No matching jobs' : ({
+          all: 'No applications yet', pending: 'No applications need refilling', ready: 'No applications ready for review', submitted: 'No submitted applications',
+          rejected: 'No rejections', invited: 'No interview invitations', done: 'No completed interviews', round: 'No additional rounds', offered: 'No offers', ghost: 'No applications waiting over 21 days',
         })[filter];
         empty.append(element('strong', title));
-        if (query.length) empty.append(document.createTextNode('试试公司简称、岗位关键词或招聘编号。'));
-        else if (filter !== 'all') empty.append(document.createTextNode('切换到「全部」查看其他岗位。'));
+        if (query.length) empty.append(document.createTextNode('Try a company name, role keyword or requisition ID.'));
+        else if (filter !== 'all') empty.append(document.createTextNode('Switch to All to see other jobs.'));
         rows.append(empty);
       }
       $('jobs').replaceChildren(rows);
@@ -538,13 +561,13 @@
       detail.className = job ? '' : 'empty';
       detail.closest('.dossier').scrollTop = 0;
       if (!job) {
-        detail.textContent = '选择岗位，查看申请详情。';
+        detail.textContent = 'Select a job to view its application.';
         return;
       }
       const heading = element('header', undefined, 'dossier-head');
       const company = element('p', undefined, 'detail-company');
-      company.append(link(job.company, job.company_url) || document.createTextNode(job.company || '公司待核对'));
-      heading.append(company, element('h2', job.role || '岗位名称待核对'));
+      company.append(link(job.company, job.company_url) || document.createTextNode(job.company || 'Company unverified'));
+      heading.append(company, element('h2', job.role || 'Role unverified'));
       const meta = element('div', undefined, 'detail-meta');
       meta.append(...status(job));
       if (job.location) meta.append(element('span', job.location));
@@ -555,64 +578,64 @@
       }
       heading.append(meta);
       appendActions(heading, [
-        [job.ready_to_go ? '打开申请复核' : '打开申请页', job.apply_url, Boolean(job.ready_to_go)],
-        ['查看岗位描述', job.jd_url !== job.apply_url ? job.jd_url : null],
+        [job.ready_to_go ? 'Review application' : 'Open application', job.apply_url, Boolean(job.ready_to_go)],
+        ['View job description', job.jd_url !== job.apply_url ? job.jd_url : null],
       ]);
-      if (job.ready_to_go) heading.append(element('p', '请在原申请网站复核并提交。', 'intro followup'));
+      if (job.ready_to_go) heading.append(element('p', 'Review and submit on the original application website.', 'intro followup'));
       detail.append(heading);
 
-      const tracking = block('查申请进度', 'tracking');
+      const tracking = block('Track application', 'tracking');
       const progress = job.tracking || {};
       if (progress.instructions) tracking.append(element('p', progress.instructions));
-      else if (!progress.url && !progress.email_url) tracking.append(element('p', '查询方式待补充。'));
+      else if (!progress.url && !progress.email_url) tracking.append(element('p', 'Tracking information not yet available.'));
       appendActions(tracking, [
-        [progress.url === progress.email_url ? '打开确认邮件' : '打开查询入口', progress.url, true],
-        ['打开确认邮件', progress.email_url !== progress.url ? progress.email_url : null, !progress.url],
+        [progress.url === progress.email_url ? 'Open confirmation email' : 'Open tracking portal', progress.url, true],
+        ['Open confirmation email', progress.email_url !== progress.url ? progress.email_url : null, !progress.url],
       ]);
       detail.append(tracking);
       if (job.recruiting) detail.append(renderRecruiting(job));
 
       if (job.questions?.length) detail.append(renderQuestions(job));
 
-      const record = block('申请状态');
+      const record = block('Application status');
       entries(record, [
-        ['提交日期', formatTime(job.submitted_at)],
-        ['最近核对', formatTime(job.checked_at)],
-        ['状态来源', job.status_source?.label],
-        ['职位状态', job.posting_status],
+        ['Submission date', formatTime(job.submitted_at)],
+        ['Last checked', formatTime(job.checked_at)],
+        ['Status source', job.status_source?.label],
+        ['Posting status', job.posting_status],
       ]);
-      if (record.childElementCount === 1) record.append(element('p', '待补充核对记录。', 'muted'));
+      if (record.childElementCount === 1) record.append(element('p', 'No verification record yet.', 'muted'));
       detail.append(record);
       if (job.status_audit) {
-        const audit = disclosure('最近一次状态核查');
+        const audit = disclosure('Latest status check');
         audit.append(element('p', formatTime(job.status_audit.checked_at, true), 'muted'));
         listItems(audit, job.status_audit.findings);
         detail.append(audit);
       }
 
       if (Object.values(job.job_details || {}).some(value => value != null && value !== '')) {
-        const facts = block('岗位信息快照');
+        const facts = block('Job snapshot');
         entries(facts, Object.entries(job.job_details));
         detail.append(facts);
       }
-      if (!job.apply_url && !job.jd_url) record.append(element('p', '原岗位链接待补充。', 'muted'));
+      if (!job.apply_url && !job.jd_url) record.append(element('p', 'Original job link not yet available.', 'muted'));
       if (job.blockers?.length || job.notes?.length) {
-        const notes = disclosure('申请备注与待确认事项');
+        const notes = disclosure('Notes and items to confirm');
         listItems(notes, job.blockers);
         listItems(notes, job.notes);
         detail.append(notes);
       }
       if (job.resume_path || job.fields?.length || ids.length) {
-        const sources = disclosure('投递材料与字段来源');
+        const sources = disclosure('Materials and field sources');
         entries(sources, [
           ...ids.map(([key, value]) => [identifierLabels[key], value]),
-          ['简历', job.resume_path],
-          ...(job.fields || []).map(field => [field.label, [field.value, field.verified ? '已核验' : '待核验', field.source].filter(value => value != null && value !== '').join(' / ')]),
+          ['Resume', job.resume_path],
+          ...(job.fields || []).map(field => [field.label, [field.value, field.verified ? 'Verified' : 'Unverified', field.source].filter(value => value != null && value !== '').join(' / ')]),
         ]);
         detail.append(sources);
       }
       if (job.history?.length || job.submission_evidence?.text) {
-        const history = disclosure('状态变更记录');
+        const history = disclosure('Change history');
         if (job.submission_evidence?.text) history.append(element('p', job.submission_evidence.text));
         const timeline = element('ul', undefined, 'history');
         for (const event of [...(job.history || [])].reverse()) {
@@ -633,32 +656,32 @@
       const progress = job.recruiting;
       const section = element('section', undefined, 'detail-block');
       const header = element('div', undefined, 'progress-header');
-      const add = element('button', '添加进展', 'quiet-button');
+      const add = element('button', 'Add progress', 'quiet-button');
       add.type = 'button';
       add.addEventListener('click', () => openProgress(job));
-      header.append(element('h3', '招聘时间线'), add);
+      header.append(element('h3', 'Recruiting timeline'), add);
       section.append(header);
       let waiting = '';
-      if (progress.waiting_on === 'candidate') waiting = '待你回复或完成下一步';
-      else if (progress.waiting_on === 'scheduled') waiting = '已有面试安排';
+      if (progress.waiting_on === 'candidate') waiting = 'Waiting for your response or next action';
+      else if (progress.waiting_on === 'scheduled') waiting = 'Interview scheduled';
       else if (progress.waiting_days != null) {
         waiting = progress.ghost
-          ? `Ghost：已等招聘方回复 ${progress.waiting_days} 天`
-          : `等待招聘方回复 ${progress.waiting_days} 天`;
-      } else if (progress.waiting_on) waiting = '等待起始日期待补充';
+          ? `Ghost: waiting ${progress.waiting_days} days for a response`
+          : `Waiting ${progress.waiting_days} days for a response`;
+      } else if (progress.waiting_on) waiting = 'Waiting start date unknown';
       if (waiting) section.append(element('p', waiting, progress.ghost ? 'waiting overdue' : 'waiting'));
 
       const timeline = element('ul', undefined, 'history');
       for (const event of progress.events) {
         const item = element('li');
-        item.append(element('time', formatTime(event.date)), element('strong', event.label));
-        if (event.scheduled_for) item.append(element('p', `面试日期 ${formatTime(event.scheduled_for)}`, 'muted'));
+        item.append(element('time', formatTime(event.date)), element('strong', progressLabel(event)));
+        if (event.scheduled_for) item.append(element('p', `Interview date ${formatTime(event.scheduled_for)}`, 'muted'));
         if (event.note) item.append(element('p', event.note));
         if (event.source) item.append(element('p', event.source, 'muted'));
         timeline.append(item);
       }
       const submission = element('li');
-      submission.append(element('time', formatTime(progress.submitted_on) || '日期待补充'), element('strong', '已提交申请'));
+      submission.append(element('time', formatTime(progress.submitted_on) || 'Date unknown'), element('strong', 'Application submitted'));
       timeline.append(submission);
       section.append(timeline);
       return section;
@@ -679,11 +702,11 @@
       progressJobId = job.id;
       $('progress-form').reset();
       $('progress-job').textContent = [job.company, job.role].filter(Boolean).join(' / ');
-      const placeholder = element('option', '选择事件');
+      const placeholder = element('option', 'Select an event');
       placeholder.value = '';
       placeholder.disabled = true;
       const options = Object.entries(state.recruiting_event_types).map(([value, label]) => {
-        const option = element('option', label);
+        const option = element('option', progressLabels[value] || label);
         option.value = value;
         return option;
       });
@@ -716,13 +739,13 @@
           method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload),
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || '请稍后重试。');
+        if (!response.ok) throw new Error(data.error || 'Please try again.');
         state = data;
         $('progress-dialog').close();
         renderList();
-        notice('招聘进展已保存。');
+        notice('Recruiting progress saved.');
       } catch (failure) {
-        error.textContent = `保存失败。${failure.message}`;
+        error.textContent = `Save failed.${failure.message}`;
         error.hidden = false;
       } finally {
         saving = false;
@@ -733,8 +756,8 @@
 
     function renderQuestions(job) {
       const canEdit = !submittedStates.has(job.state);
-      const section = block('申请问题', 'question-section');
-      const save = element('button', '保存答案', 'action');
+      const section = block('Application questions', 'question-section');
+      const save = element('button', 'Save answers', 'action');
       save.type = 'button';
       const message = element('span', undefined, 'answer-status');
       message.setAttribute('role', 'status');
@@ -747,10 +770,10 @@
         const inputId = `answer-${index}`;
         const label = element('label', question.text);
         label.htmlFor = inputId;
-        box.append(label, element('p', `${question.required !== false ? '必填' : '可选'} / ${questionLabels[question.status] || '待回答'}`, 'muted'));
-        if (question.options?.length) box.append(element('p', `可选答案 ${question.options.join(' / ')}`, 'muted'));
-        if (question.limit) box.append(element('p', `原站长度限制 ${question.limit}`, 'muted'));
-        const source = link('查看问题来源', question.source_url);
+        box.append(label, element('p', `${question.required !== false ? 'Required' : 'Optional'} / ${questionLabels[question.status] || 'Awaiting answer'}`, 'muted'));
+        if (question.options?.length) box.append(element('p', `Options: ${question.options.join(' / ')}`, 'muted'));
+        if (question.limit) box.append(element('p', `Original length limit: ${question.limit}`, 'muted'));
+        const source = link('View question source', question.source_url);
         if (source) box.append(source);
         const input = element('textarea');
         input.id = inputId;
@@ -764,7 +787,7 @@
           if (input.value === original) edits.delete(question.id);
           else edits.set(question.id, {answer: input.value, expected_answer: original});
           message.classList.remove('error-text');
-          message.textContent = edits.size ? '有未保存的修改' : '';
+          message.textContent = edits.size ? 'Unsaved changes' : '';
           syncSave();
           syncRefresh();
         });
@@ -775,7 +798,7 @@
         const actions = element('div', undefined, 'actions');
         actions.append(save, message);
         section.append(actions);
-        if (drafts.get(job.id)?.size) message.textContent = '有未保存的修改';
+        if (drafts.get(job.id)?.size) message.textContent = 'Unsaved changes';
         syncSave();
         save.addEventListener('click', async () => {
           if (saving || !drafts.get(job.id)?.size) return;
@@ -784,7 +807,7 @@
           syncRefresh();
           inputs.forEach(input => { input.readOnly = true; });
           message.classList.remove('error-text');
-          message.textContent = '正在保存…';
+          message.textContent = 'Saving…';
           const answers = [...drafts.get(job.id)].map(([id, value]) => ({id, ...value}));
           try {
             const response = await fetch('/api/answers', {
@@ -794,16 +817,16 @@
             });
             const data = await response.json();
             if (!response.ok) throw new Error(response.status === 409
-              ? '岗位或答案已在其他地方更新。本页仍保留你的编辑。' : '请稍后重试。');
+              ? 'The job or answer changed elsewhere. Your edits remain on this page.' : 'Please try again.');
             drafts.delete(job.id);
             state = data;
             detailSignature = undefined;
             renderOverview();
             renderList();
-            notice('答案已保存。回到对话发送「继续回填」。');
+            notice('Answers saved. Return to the chat and ask to continue filling.');
           } catch (error) {
-            notice(`保存失败。${error.message}`, true);
-            message.textContent = '保存失败，修改仍在本页';
+            notice(`Save failed.${error.message}`, true);
+            message.textContent = 'Save failed. Your edits remain on this page.';
             message.classList.add('error-text');
           } finally {
             saving = false;
@@ -835,8 +858,8 @@
         }
         if (manual || $('notice').classList.contains('error')) notice();
       } catch {
-        notice('无法读取岗位记录。确认本地服务已启动后，点击「刷新记录」。', true);
-        if (!initialized) $('jobs').replaceChildren(element('li', '岗位记录暂时无法读取。', 'empty'));
+        notice('Unable to load applications. Check the local server, then click Refresh records.', true);
+        if (!initialized) $('jobs').replaceChildren(element('li', 'Applications are temporarily unavailable.', 'empty'));
       } finally {
         loading = false;
         syncRefresh();
